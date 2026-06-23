@@ -3,6 +3,7 @@ package com.steamlibrary.service;
 import com.steamlibrary.model.*;
 import com.steamlibrary.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StoreService {
 
     private final ProductRepository productRepository;
@@ -25,8 +27,14 @@ public class StoreService {
 
     public List<CartItem> getCart(User user) { return cartRepository.findByUser(user); }
 
+    public double getCartTotal(List<CartItem> cartItems) {
+        return cartItems.stream().mapToDouble(CartItem::getEffectivePrice).sum();
+    }
+
+    /** @deprecated Use getCartTotal(List<CartItem>) instead to avoid fetching cart twice */
+    @Deprecated
     public double getCartTotal(User user) {
-        return getCart(user).stream().mapToDouble(CartItem::getEffectivePrice).sum();
+        return getCartTotal(getCart(user));
     }
 
     @Transactional
@@ -60,14 +68,38 @@ public class StoreService {
         orderRepository.save(order);
 
         cartRepository.deleteByUser(user);
+
+        log.info("Order created: user={}, products={}, total={}", user.getUsername(), products.size(), total);
         return order;
     }
 
     /** IDs of products already owned by this user */
+    @Transactional(readOnly = true)
     public Set<Long> getOwnedProductIds(User user) {
-        return orderRepository.findByUser(user).stream()
+        List<Order> orders = orderRepository.findByUser(user);
+        log.debug("Found {} orders for user {}", orders.size(), user.getUsername());
+
+        Set<Long> ownedIds = orders.stream()
                 .flatMap(o -> o.getProducts().stream())
                 .map(Product::getId)
                 .collect(Collectors.toSet());
+
+        log.debug("User {} owns {} unique products", user.getUsername(), ownedIds.size());
+        return ownedIds;
+    }
+
+    /** Get all purchased products for this user */
+    @Transactional(readOnly = true)
+    public List<Product> getPurchasedProducts(User user) {
+        List<Order> orders = orderRepository.findByUser(user);
+        log.debug("Found {} orders for user {}", orders.size(), user.getUsername());
+
+        List<Product> products = orders.stream()
+                .flatMap(o -> o.getProducts().stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        log.debug("User {} has purchased {} unique products", user.getUsername(), products.size());
+        return products;
     }
 }

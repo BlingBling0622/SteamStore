@@ -7,53 +7,85 @@
     <title th:text="#{dashboard.title} + ' - Steam'">Library</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
-        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
+        body{font-family:'Motiva Sans','Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+
+        /* Navigation */
+        nav{background:#171a21;border-bottom:1px solid #000;padding:.75rem 0}
+        .nav-inner{max-width:100%;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
         .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
         .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+        .nav-inner a{color:#b8b6b4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
         .nav-inner a:hover,.nav-inner a.active{color:#fff;background:rgba(255,255,255,.1)}
         .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-        .btn-logout{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer}
+        .btn-logout{padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer}
+        .btn-logout:hover{background:#6d9314}
         .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
         .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
-        .lang-select:focus{outline:none;border-color:#66c0f4}
-        .main{max-width:1200px;margin:2rem auto;padding:0 20px;flex:1;width:100%}
-        .alert{padding:.875rem 1.25rem;border-radius:2px;margin-bottom:1.5rem;font-size:.9rem}
-        .alert-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007}
-        .alert-error{background:rgba(180,40,40,.15);border:1px solid #c44;color:#f6b4b4}
-        .page-header{margin-bottom:1.5rem}
-        .page-header h1{font-size:1.5rem;color:#fff;font-weight:700}
-        .page-header p{color:#8f98a0;font-size:.875rem;margin-top:.25rem}
-        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-        .stat-card{background:#2a475e;border:1px solid #4b6a88;border-radius:3px;padding:1.25rem 1.5rem}
-        .stat-card .label{font-size:.75rem;color:#8f98a0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
-        .stat-card .value{font-size:2rem;color:#66c0f4;font-weight:700}
-        .section{background:#2a475e;border:1px solid #4b6a88;border-radius:3px;margin-bottom:2rem;overflow:hidden}
-        .section-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid #4b6a88}
-        .section-head h2{font-size:1rem;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-        .btn-small{padding:.35rem .875rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.8rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none}
-        .steam-profile{display:flex;align-items:center;gap:1.25rem;padding:1.25rem}
-        .steam-avatar{width:64px;height:64px;border-radius:2px;border:2px solid #66c0f4}
-        .steam-info h3{color:#fff;font-size:1rem;font-weight:700;margin-bottom:.25rem}
-        .steam-info p{color:#8f98a0;font-size:.85rem}
-        .online-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a4d007;margin-right:.4rem}
-        .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;border-top:1px solid #4b6a88}
-        .lib-item{display:flex;flex-direction:column;border-right:1px solid #4b6a88;border-bottom:1px solid #4b6a88;overflow:hidden}
-        .lib-item img{width:100%;height:75px;object-fit:cover;display:block}
-        .lib-item-body{padding:.625rem .75rem;flex:1}
-        .lib-item-body h4{font-size:.8rem;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.2rem}
-        .lib-item-body .time{font-size:.75rem;color:#8f98a0}
-        .lib-item-body .time strong{color:#66c0f4}
-        .empty-state{padding:3rem;text-align:center}
-        .empty-state p{color:#8f98a0;margin-bottom:1rem;font-size:.9rem}
-        .btn-link{display:inline-block;padding:.75rem 1.5rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-weight:700;font-size:.9rem;border-radius:2px;text-decoration:none}
-        .connect-box{padding:2.5rem;text-align:center}
-        .connect-box h3{color:#fff;font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
-        .connect-box p{color:#8f98a0;font-size:.875rem;margin-bottom:1.5rem}
-        footer{background:#171d25;border-top:1px solid #2a475e;padding:1.5rem;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:auto}
-        @media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr}.lib-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+
+        /* Main Layout */
+        .container{display:flex;flex:1}
+
+        /* Sidebar */
+        .sidebar{width:240px;background:#16202d;padding:1rem;border-right:1px solid #000;overflow-y:auto}
+        .sidebar h3{font-size:.75rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;font-weight:600}
+        .sidebar ul{list-style:none;margin-bottom:1.5rem}
+        .sidebar li{margin-bottom:.25rem}
+        .sidebar a{display:block;color:#c6d4df;text-decoration:none;padding:.4rem .5rem;border-radius:2px;font-size:.875rem;transition:all .2s}
+        .sidebar a:hover{background:rgba(103,193,245,.2);color:#66c0f4}
+        .sidebar a.active{background:#66c0f4;color:#fff}
+        .filter-item{display:flex;justify-content:space-between;align-items:center}
+        .count{font-size:.75rem;color:#8f98a0;background:#1b2838;padding:.1rem .4rem;border-radius:10px}
+
+        /* Main Content */
+        .main-content{flex:1;padding:1.5rem 2rem;overflow-y:auto}
+
+        /* Header */
+        .page-header{margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+        .page-header h1{font-size:1.75rem;color:#fff;font-weight:300}
+        .view-options{display:flex;gap:.5rem}
+        .view-btn{padding:.5rem;background:#2a475e;border:1px solid #4b6a88;color:#8f98a0;cursor:pointer;border-radius:2px}
+        .view-btn:hover,.view-btn.active{background:#66c0f4;color:#fff;border-color:#66c0f4}
+
+        /* Search Bar */
+        .search-bar{margin-bottom:1.5rem}
+        .search-bar input{width:100%;max-width:400px;padding:.6rem 1rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
+        .search-bar input:focus{outline:none;border-color:#66c0f4;background:#2a475e}
+
+        /* Game Grid */
+        .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:1rem}
+        .game-card{background:#16202d;border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+        .game-card:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,.5)}
+        .game-card.hidden{display:none}
+        .fav-btn{position:absolute;top:.5rem;right:.5rem;width:28px;height:28px;background:rgba(0,0,0,.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;cursor:pointer;z-index:10;opacity:0;transition:all .2s}
+        .fav-btn:hover{background:#66c0f4;transform:scale(1.1)}
+        .fav-btn.favorited{opacity:1;color:#f00}
+        .game-card:hover .fav-btn{opacity:.8}
+        .game-card img{width:100%;height:87px;object-fit:cover;display:block}
+        .game-info{padding:.75rem}
+        .game-info h4{font-size:.875rem;color:#fff;font-weight:400;margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .game-meta{font-size:.75rem;color:#8f98a0}
+        .game-meta strong{color:#66c0f4}
+        .playtime{display:inline-block;background:#1b2838;padding:.2rem .5rem;border-radius:2px;margin-top:.25rem}
+
+        /* Empty State */
+        .empty-state{text-align:center;padding:4rem 2rem;color:#8f98a0}
+        .empty-state h3{font-size:1.25rem;color:#fff;margin-bottom:1rem}
+        .empty-state p{margin-bottom:1.5rem}
+        .btn-primary{display:inline-block;padding:.75rem 2rem;background:#5c7e10;color:#d2e885;font-weight:700;text-decoration:none;border-radius:2px;font-size:.9rem}
+        .btn-primary:hover{background:#6d9314}
+
+        /* Stats */
+        .stats{display:flex;gap:1rem;margin-bottom:2rem}
+        .stat-card{flex:1;background:#16202d;padding:1rem;border-radius:4px;border:1px solid #000}
+        .stat-card .label{font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem}
+        .stat-card .value{font-size:1.75rem;color:#66c0f4;font-weight:300}
+
+        footer{background:#171a21;border-top:1px solid #000;padding:1.5rem;text-align:center;color:#8f98a0;font-size:.8rem}
+
+        @media(max-width:768px){
+            .sidebar{display:none}
+            .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
+        }
     </style>
 </head>
 <body>
@@ -81,75 +113,274 @@
         </div>
     </div>
 </nav>
-<div class="main">
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    <div class="page-header">
-        <h1 th:text="#{dashboard.title}">Your Library</h1>
-        <p><span th:text="#{dashboard.signedin}">Signed in as</span> <span th:text="${user.username}"></span></p>
-    </div>
 
-    <div th:if="${!steamLinked}" class="section">
-        <div class="connect-box">
-            <h3 th:text="#{dashboard.connect}">Connect Steam Account</h3>
-            <p th:text="#{dashboard.connectdesc}">Link your Steam account.</p>
-            <a href="/steam/link" class="btn-link" th:text="#{dashboard.linksteam}">Link Steam Account</a>
+<div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h3>Library Home</h3>
+        <ul>
+            <li><a href="#" onclick="filterBy('all'); return false;" class="filter-item active" data-filter="all">
+                <span>All Games</span>
+                <span class="count" th:text="${gameCount}">0</span>
+            </a></li>
+            <li><a href="#" onclick="filterBy('recent'); return false;" class="filter-item" data-filter="recent">
+                <span>Recent</span>
+            </a></li>
+            <li><a href="#" onclick="filterBy('favorites'); return false;" class="filter-item" data-filter="favorites">
+                <span>Favorites</span>
+            </a></li>
+        </ul>
+
+        <h3>Collections</h3>
+        <ul>
+            <li><a href="#" onclick="filterByTag('Action'); return false;" class="filter-item" data-filter="action">
+                <span>Action</span>
+            </a></li>
+            <li><a href="#" onclick="filterByTag('RPG'); return false;" class="filter-item" data-filter="rpg">
+                <span>RPG</span>
+            </a></li>
+            <li><a href="#" onclick="filterByTag('Adventure'); return false;" class="filter-item" data-filter="adventure">
+                <span>Adventure</span>
+            </a></li>
+            <li><a href="#" onclick="filterByTag('Strategy'); return false;" class="filter-item" data-filter="strategy">
+                <span>Strategy</span>
+            </a></li>
+        </ul>
+
+        <h3>Filters</h3>
+        <ul>
+            <li><a href="#" onclick="alert('Install feature coming soon!'); return false;" class="filter-item">
+                <span>Installed</span>
+            </a></li>
+            <li><a href="#" onclick="alert('Install feature coming soon!'); return false;" class="filter-item">
+                <span>Not Installed</span>
+            </a></li>
+            <li><a href="#" onclick="alert('Updates feature coming soon!'); return false;" class="filter-item">
+                <span>Updates</span>
+            </a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Your Library</h1>
+            <div class="view-options">
+                <button class="view-btn active" title="Grid View">⊞</button>
+                <button class="view-btn" title="List View">☰</button>
+            </div>
         </div>
-    </div>
 
-    <div th:if="${steamLinked}">
-        <div class="stats-grid">
+        <!-- Stats -->
+        <div class="stats">
             <div class="stat-card">
-                <div class="label" th:text="#{dashboard.games}">Games Owned</div>
+                <div class="label">Games Owned</div>
                 <div class="value" th:text="${gameCount}">0</div>
             </div>
             <div class="stat-card">
-                <div class="label" th:text="#{dashboard.hours}">Hours Played</div>
-                <div class="value" th:text="${#numbers.formatDecimal(totalPlaytime / 60.0, 1, 1)}">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="label" th:text="#{dashboard.synced}">Last Synced</div>
-                <div class="value" style="font-size:1.1rem" th:text="${#temporals.format(steamAccount.lastSynced, 'MMM dd HH:mm')}">—</div>
+                <div class="label">Total Value</div>
+                <div class="value" style="font-size:1.25rem">Coming Soon</div>
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-head">
-                <h2 th:text="#{dashboard.profile}">Steam Profile</h2>
-                <a href="/steam/sync" class="btn-small" th:text="#{dashboard.sync}">Sync Library</a>
-            </div>
-            <div class="steam-profile">
-                <img th:src="${steamAccount.avatarUrl}" alt="avatar" class="steam-avatar">
-                <div class="steam-info">
-                    <h3 th:text="${steamAccount.personaName}">Player</h3>
-                    <p><span class="online-dot"></span>Steam ID: <span th:text="${steamAccount.steamId}"></span></p>
-                </div>
-            </div>
+        <!-- Search -->
+        <div class="search-bar">
+            <input type="text" placeholder="Search your library..." id="searchInput" onkeyup="filterGames()">
         </div>
 
-        <div class="section">
-            <div class="section-head">
-                <h2><span th:text="#{nav.library}">Library</span> (<span th:text="${gameCount}"></span>)</h2>
-                <a href="/store" class="btn-small" th:text="#{dashboard.browse}">Browse Store</a>
-            </div>
-            <div th:if="${library.isEmpty()}" class="empty-state">
-                <p>No games found.</p>
-                <a href="/store" class="btn-link" th:text="#{dashboard.browse}">Go to Store</a>
-            </div>
-            <div th:if="${!library.isEmpty()}" class="lib-grid">
-                <div class="lib-item" th:each="game : ${library}">
-                    <img th:src="${game.imgLogoUrl}" th:alt="${game.gameName}" onerror="this.src='https://cdn.akamai.steamstatic.com/steam/apps/220/header.jpg'">
-                    <div class="lib-item-body">
-                        <h4 th:text="${game.gameName}">Game</h4>
-                        <div class="time"><strong th:text="${#numbers.formatDecimal(game.playtimeForever / 60.0, 1, 1)} + ' hrs'"></strong></div>
+        <!-- Games Grid -->
+        <div th:if="${purchasedGames.isEmpty()}" class="empty-state">
+            <h3>Your library is empty</h3>
+            <p>Start building your collection by browsing the store</p>
+            <a href="/store" class="btn-primary">Browse Store</a>
+        </div>
+
+        <div id="emptyFiltered" class="empty-state" style="display:none">
+            <h3>No games found</h3>
+            <p>Try a different filter or search term.</p>
+        </div>
+
+        <div th:if="${!purchasedGames.isEmpty()}" class="games-grid" id="gamesGrid">
+            <div class="game-card"
+                 th:each="product : ${purchasedGames}"
+                 th:data-name="${product.name.toLowerCase()}"
+                 th:data-tags="${product.tags != null ? product.tags.toLowerCase() : ''}"
+                 th:data-id="${product.id}">
+                <div class="fav-btn" th:data-id="${product.id}" onclick="toggleFav(this)" title="Favorite">♡</div>
+                <img th:src="${product.headerImageUrl}"
+                     th:alt="${product.name}"
+                     onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+                <div class="game-info">
+                    <h4 th:text="${product.name}">Game Name</h4>
+                    <div class="game-meta">
+                        <span class="playtime" th:each="tag,i : ${#strings.arraySplit(product.tags != null ? product.tags : '', ',')}"
+                              th:if="${i.index == 0}" th:text="${#strings.trim(tag)}">Tag</span>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
+
 <footer>
     <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
 </footer>
+
+<script>
+// Store favorites in localStorage
+let favorites = JSON.parse(localStorage.getItem('steamFavorites') || '[]');
+
+// Apply favorites on page load
+document.addEventListener('DOMContentLoaded', function() {
+    favorites.forEach(id => {
+        const btn = document.getElementById('fav-' + id);
+        if (btn) {
+            btn.classList.add('favorited');
+            btn.textContent = '♥';
+        }
+    });
+
+    // Set active state on All Games by default
+    document.querySelector('[data-filter="all"]').classList.add('active');
+});
+
+// Toggle favorite
+function toggleFav(id, btn) {
+    event.stopPropagation();
+    const idx = favorites.indexOf(id);
+    if (idx > -1) {
+        favorites.splice(idx, 1);
+        btn.classList.remove('favorited');
+        btn.textContent = '♥';
+    } else {
+        favorites.push(id);
+        btn.classList.add('favorited');
+        btn.textContent = '♥';
+    }
+    localStorage.setItem('steamFavorites', JSON.stringify(favorites));
+}
+
+// Search filter
+function filterGames() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const grid = document.getElementById('gamesGrid');
+    const cards = grid.getElementsByClassName('game-card');
+    let visibleCount = 0;
+
+    for (let i = 0; i < cards.length; i++) {
+        const name = cards[i].getAttribute('data-name');
+        if (name.indexOf(filter) > -1) {
+            cards[i].classList.remove('hidden');
+            visibleCount++;
+        } else {
+            cards[i].classList.add('hidden');
+        }
+    }
+
+    toggleEmptyState(visibleCount);
+}
+
+// Filter by category (Library Home)
+function filterBy(type) {
+    const grid = document.getElementById('gamesGrid');
+    const cards = grid.getElementsByClassName('game-card');
+    let visibleCount = 0;
+
+    // Clear search
+    document.getElementById('searchInput').value = '';
+
+    // Update active state
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    document.querySelector('[data-filter="' + type + '"]').classList.add('active');
+
+    for (let i = 0; i < cards.length; i++) {
+        const id = parseInt(cards[i].getAttribute('data-id'));
+
+        if (type === 'all') {
+            cards[i].classList.remove('hidden');
+            visibleCount++;
+        } else if (type === 'favorites') {
+            if (favorites.includes(id)) {
+                cards[i].classList.remove('hidden');
+                visibleCount++;
+            } else {
+                cards[i].classList.add('hidden');
+            }
+        } else if (type === 'recent') {
+            // Show last 10 games (simple implementation)
+            if (i < 10) {
+                cards[i].classList.remove('hidden');
+                visibleCount++;
+            } else {
+                cards[i].classList.add('hidden');
+            }
+        }
+    }
+
+    toggleEmptyState(visibleCount);
+}
+
+// Filter by tag (Collections)
+function filterByTag(tag) {
+    const grid = document.getElementById('gamesGrid');
+    const cards = grid.getElementsByClassName('game-card');
+    const searchTag = tag.toLowerCase();
+    let visibleCount = 0;
+
+    // Clear search
+    document.getElementById('searchInput').value = '';
+
+    // Update active state
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    event.target.closest('a').classList.add('active');
+
+    for (let i = 0; i < cards.length; i++) {
+        const tags = cards[i].getAttribute('data-tags');
+        if (tags && tags.indexOf(searchTag) > -1) {
+            cards[i].classList.remove('hidden');
+            visibleCount++;
+        } else {
+            cards[i].classList.add('hidden');
+        }
+    }
+
+    toggleEmptyState(visibleCount);
+}
+
+// Toggle empty state
+function toggleEmptyState(visibleCount) {
+    const emptyFiltered = document.getElementById('emptyFiltered');
+    const emptyInitial = document.querySelector('.empty-state:not(#emptyFiltered)');
+
+    if (emptyFiltered) {
+        if (visibleCount === 0 && !emptyInitial) {
+            emptyFiltered.style.display = 'block';
+        } else {
+            emptyFiltered.style.display = 'none';
+        }
+    }
+}
+
+// View toggle (Grid/List)
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const grid = document.getElementById('gamesGrid');
+        if (this.title === 'List View') {
+            grid.style.gridTemplateColumns = '1fr';
+            alert('List view coming soon!');
+        } else {
+            grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(184px,1fr))';
+        }
+    });
+});
+</script>
 </body>
 </html>

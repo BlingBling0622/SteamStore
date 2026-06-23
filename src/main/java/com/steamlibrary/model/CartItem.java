@@ -6,7 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_items",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class CartItem {
     private Product product;
 
     public double getEffectivePrice() {
-        if (product.getDiscountPercent() != null && product.getDiscountPercent() > 0) {
+        if (product.getDiscountPercent() > 0) {
             return product.getPrice() * (1 - product.getDiscountPercent() / 100.0);
         }
         return product.getPrice();

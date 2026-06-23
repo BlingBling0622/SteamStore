@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,9 +63,19 @@
         <a href="/store" th:text="#{nav.store}">Store</a>
         <div class="nav-right">
             <a href="/dashboard" class="btn-login" th:text="#{nav.library}">Library</a>
-            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span></a>
-            <a href="/login" class="btn-login" th:text="#{nav.signin}">Sign In</a>
-            <a href="/register" class="btn-nav" th:text="#{nav.joinfree}">Join Free</a>
+            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span>
+                <span sec:authorize="isAuthenticated()" th:if="${cartCount != null and cartCount > 0}" th:text="'(' + ${cartCount} + ')'"></span>
+            </a>
+            <div sec:authorize="isAuthenticated()">
+                <span style="color:#8f98a0;font-size:.85rem;margin-right:.5rem" sec:authentication="name"></span>
+                <form th:action="@{/logout}" method="post" style="display:inline">
+                    <button type="submit" class="btn-login" style="background:none;border:none;color:#66c0f4;cursor:pointer;padding:.4rem 1rem" th:text="#{nav.signout}">Sign Out</button>
+                </form>
+            </div>
+            <div sec:authorize="!isAuthenticated()">
+                <a href="/login" class="btn-login" th:text="#{nav.signin}">Sign In</a>
+                <a href="/register" class="btn-nav" th:text="#{nav.joinfree}">Join Free</a>
+            </div>
             <select class="lang-select" onchange="window.location.href='?lang='+this.value">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>

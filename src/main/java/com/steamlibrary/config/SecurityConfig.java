@@ -37,6 +37,11 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
+            .sessionManagement(session -> session
+                .sessionFixation().migrateSession()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+            )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**")
             )

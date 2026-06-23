@@ -1,59 +1,88 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name} + ' on Steam'">Game</title>
+    <title th:text="${product.name} + ' on Steam'">Game on Steam</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df}
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
+        body{font-family:'Motiva Sans','Arial',sans-serif;background:#1b2838;color:#c6d4df;min-height:100vh}
+
+        /* Navigation */
+        nav{background:#171a21;border-bottom:1px solid #000;padding:.75rem 0;position:sticky;top:0;z-index:1000}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
         .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
         .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+        .nav-inner a{color:#b8b6b4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
         .nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
         .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+        .btn-lib{padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;text-decoration:none}
+        .btn-lib:hover{background:#6d9314}
         .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
-        .btn-lib{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none}
-        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
-        .lang-select:focus{outline:none;border-color:#66c0f4}
-        .breadcrumb{max-width:1200px;margin:1rem auto;padding:0 20px;font-size:.8rem;color:#8f98a0}
-        .breadcrumb a{color:#66c0f4;text-decoration:none}
-        .main{max-width:1200px;margin:0 auto;padding:1rem 20px 3rem}
-        .game-title{font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:1rem}
-        .game-layout{display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start}
-        .game-media img{width:100%;border-radius:3px;display:block}
-        .sidebar{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;padding:1.25rem}
-        .sidebar img{width:100%;border-radius:3px;margin-bottom:1rem;display:block}
-        .sidebar-desc{font-size:.875rem;color:#c6d4df;line-height:1.6;margin-bottom:1.25rem;border-bottom:1px solid #4b6a88;padding-bottom:1.25rem}
-        .meta-row{display:flex;justify-content:space-between;font-size:.8rem;color:#8f98a0;margin-bottom:.5rem}
-        .meta-row span:last-child{color:#c6d4df}
-        .review-row{margin:1rem 0;font-size:.85rem}
-        .review-label{color:#8f98a0;margin-bottom:.25rem}
-        .review-overwhelm{color:#a4d007;font-weight:700}
-        .review-pos{color:#66c0f4;font-weight:700}
-        .review-mostly{color:#c6d4df;font-weight:700}
-        .tags-row{margin-bottom:1.25rem}
-        .tags-label{font-size:.75rem;color:#8f98a0;margin-bottom:.4rem}
-        .tags{display:flex;flex-wrap:wrap;gap:.3rem}
-        .tag{background:rgba(103,193,245,.1);color:#66c0f4;padding:.15rem .5rem;border-radius:2px;font-size:.75rem;text-decoration:none}
-        .tag:hover{background:rgba(103,193,245,.2)}
-        .purchase-box{background:#1b2838;border:1px solid #2a475e;border-radius:3px;padding:1rem;margin-top:1rem}
-        .purchase-title{font-size:.8rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.75rem}
-        .price-block{display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem}
-        .badge-discount{background:#4c6b22;color:#a4d007;padding:.3rem .6rem;border-radius:2px;font-size:1rem;font-weight:700}
+        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem}
+
+        /* Hero */
+        .hero{background:linear-gradient(to bottom,rgba(0,0,0,0),#1b2838);padding:1.5rem 0 2rem}
+        .hero-inner{max-width:940px;margin:0 auto;padding:0 20px}
+        .breadcrumbs{font-size:.85rem;color:#8f98a0;margin-bottom:1rem}
+        .breadcrumbs a{color:#66c0f4;text-decoration:none}
+        .game-title{font-size:2rem;color:#fff;font-weight:300;margin-bottom:1.5rem}
+        .hero-layout{display:grid;grid-template-columns:616px 1fr;gap:1.5rem}
+
+        /* Media Section */
+        .main-media-container{width:100%;height:353px;background:#000;border-radius:4px 4px 0 0;position:relative;overflow:hidden}
+        .main-image,.main-video{width:100%;height:100%;object-fit:cover;display:block}
+        .main-video{display:none}
+        .media-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:1rem;display:flex;align-items:center;gap:.5rem}
+        .control-btn{width:32px;height:32px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;border-radius:2px;font-size:.9rem}
+        .control-btn:hover{background:rgba(255,255,255,.3)}
+        .media-counter{margin-left:auto;color:#8f98a0;font-size:.85rem}
+        .fullscreen-btn{position:absolute;top:1rem;right:1rem;width:36px;height:36px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.3);color:#fff;cursor:pointer;border-radius:2px;z-index:10}
+
+        .thumbnail-carousel{background:rgba(0,0,0,.6);padding:.5rem;border-radius:0 0 4px 4px;display:flex;gap:.5rem;overflow-x:auto}
+        .carousel-thumb{width:116px;height:65px;object-fit:cover;cursor:pointer;border:2px solid transparent;border-radius:2px;transition:all .2s}
+        .carousel-thumb:hover,.carousel-thumb.active{border-color:#66c0f4}
+
+        /* Purchase Box */
+        .purchase-box{background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.5));border-radius:4px;padding:1.25rem}
+        .capsule-image{width:100%;border-radius:3px;margin-bottom:1rem}
+        .short-desc{font-size:.875rem;line-height:1.6;color:#acdbf5;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+        .meta-row{display:flex;padding:.35rem 0;font-size:.85rem}
+        .meta-row .label{color:#8f98a0;min-width:80px}
+        .review-badge{color:#66c0f4;font-weight:600}
+        .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 1rem}
+        .tag{background:rgba(103,193,245,.2);color:#67c1f5;padding:.25rem .5rem;border-radius:2px;font-size:.7rem;text-decoration:none}
+
+        .buy-section{background:rgba(0,0,0,.4);border-radius:3px;padding:1rem;margin-bottom:1rem}
+        .buy-section h3{font-size:.85rem;color:#8f98a0;margin-bottom:.75rem;text-transform:uppercase}
+        .price-with-discount{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+        .discount-badge{background:#4c6b22;color:#a4d007;padding:.4rem .7rem;border-radius:2px;font-size:1.1rem;font-weight:700}
         .price-stack{display:flex;flex-direction:column}
-        .price-old{text-decoration:line-through;color:#8f98a0;font-size:.8rem}
-        .price-new{color:#acdbf5;font-size:1.25rem;font-weight:700}
-        .price-free{color:#a4d007;font-size:1.25rem;font-weight:700}
-        .btn-buy{display:block;width:100%;padding:.875rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-weight:700;font-size:.95rem;border:none;border-radius:2px;cursor:pointer;text-align:center;text-transform:uppercase;letter-spacing:.04em;text-decoration:none}
-        .btn-buy:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
-        .btn-incart{display:block;width:100%;padding:.875rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-weight:700;font-size:.95rem;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-align:center;text-decoration:none}
-        .btn-owned{display:block;width:100%;padding:.875rem;background:#1b2838;color:#a4d007;font-weight:700;font-size:.95rem;border:1px solid #4c6b22;border-radius:2px;text-align:center}
-        .flash-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007;padding:.75rem;border-radius:2px;margin-bottom:1rem;font-size:.875rem}
-        footer{background:#171d25;border-top:1px solid #2a475e;padding:2rem;text-align:center;color:#8f98a0;font-size:.8rem}
-        @media(max-width:768px){.game-layout{grid-template-columns:1fr}}
+        .original-price{text-decoration:line-through;color:#8f98a0;font-size:.85rem}
+        .final-price{color:#a4d007;font-size:1.5rem;font-weight:700}
+        .free-price{color:#a4d007;font-size:1.5rem;font-weight:700}
+        .btn-buy{width:100%;padding:1rem;background:linear-gradient(135deg,#75b022,#588a1b);color:#fff;font-weight:700;font-size:1rem;border:none;border-radius:2px;cursor:pointer}
+        .btn-buy:hover{background:linear-gradient(135deg,#83c629,#689d28)}
+        .btn-owned{padding:1rem;background:#1b2838;color:#a4d007;border:1px solid #4c6b22;border-radius:2px;text-align:center;font-weight:700}
+
+        /* Content Area */
+        .content-area{max-width:940px;margin:2rem auto;padding:0 20px}
+        section{background:#16202d;border-radius:4px;padding:1.5rem;margin-bottom:2rem}
+        section h2{font-size:1.25rem;color:#fff;font-weight:600;margin-bottom:1rem;text-transform:uppercase}
+        .about-content{line-height:1.8;color:#c6d4df}
+        .sys-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+        .sys-col h3{font-size:.9rem;color:#8f98a0;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:.5rem}
+        .sys-col ul{list-style:none}
+        .sys-col li{margin-bottom:.75rem;font-size:.85rem}
+        .sys-col li strong{color:#acdbf5}
+
+        footer{background:#171a21;border-top:1px solid #000;padding:2rem;text-align:center;color:#8f98a0;font-size:.8rem}
+
+        @media(max-width:968px){
+            .hero-layout{grid-template-columns:1fr}
+            .sys-grid{grid-template-columns:1fr}
+        }
     </style>
 </head>
 <body>
@@ -80,62 +109,221 @@
     </div>
 </nav>
 
-<div class="breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/store" th:text="#{nav.store}">Store</a> &rsaquo; <span th:text="${product.name}"></span>
-</div>
-
-<div class="main">
-    <div class="game-title" th:text="${product.name}"></div>
-    <div th:if="${success}" class="flash-success" th:text="${success}"></div>
-
-    <div class="game-layout">
-        <div class="game-media">
-            <img th:src="${product.headerImageUrl}" th:alt="${product.name}">
+<div class="hero">
+    <div class="hero-inner">
+        <div class="breadcrumbs">
+            <a href="/">Home</a> &rsaquo; <a href="/store" th:text="#{nav.store}">Store</a> &rsaquo; <span th:text="${product.name}">Game</span>
         </div>
-        <div class="sidebar">
-            <img th:src="${product.headerImageUrl}" th:alt="${product.name}">
-            <p class="sidebar-desc" th:text="${product.description}"></p>
-            <div class="meta-row"><span th:text="#{game.developer}">Developer</span><span th:text="${product.developer}"></span></div>
-            <div class="meta-row"><span th:text="#{game.publisher}">Publisher</span><span th:text="${product.publisher}"></span></div>
-            <div class="review-row">
-                <div class="review-label" th:text="#{game.reviews}">Overall Reviews:</div>
-                <span class="review-overwhelm" th:if="${product.reviewSummary != null and #strings.contains(product.reviewSummary,'Overwhelmingly')}" th:text="${product.reviewSummary}"></span>
-                <span class="review-pos"       th:if="${product.reviewSummary != null and #strings.contains(product.reviewSummary,'Very')}" th:text="${product.reviewSummary}"></span>
-                <span class="review-mostly"    th:if="${product.reviewSummary != null and !#strings.contains(product.reviewSummary,'Overwhelmingly') and !#strings.contains(product.reviewSummary,'Very')}" th:text="${product.reviewSummary}"></span>
-            </div>
-            <div class="tags-row">
-                <div class="tags-label" th:text="#{game.tags}">Tags:</div>
-                <div class="tags">
-                    <a class="tag" href="/store" th:each="tag : ${#strings.arraySplit(product.tags, ',')}" th:text="${#strings.trim(tag)}"></a>
-                </div>
-            </div>
-            <div class="purchase-box">
-                <div class="purchase-title" th:text="#{game.buy} + ' ' + ${product.name}"></div>
-                <div class="price-block">
-                    <span class="badge-discount" th:if="${product.discountPercent > 0}" th:text="'-' + ${product.discountPercent} + '%'"></span>
-                    <div class="price-stack">
-                        <span class="price-old"  th:if="${product.discountPercent > 0}"
-                              th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}"></span>
-                        <span class="price-free" th:if="${product.price == 0}" th:text="#{store.free}">Free to Play</span>
-                        <span class="price-new"  th:if="${product.price > 0 and product.discountPercent > 0}"
-                              th:text="${cSym} + ${#numbers.formatDecimal(product.price * (1 - product.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
-                        <span class="price-new"  th:if="${product.price > 0 and product.discountPercent == 0}"
-                              th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}"></span>
+        <h1 class="game-title" th:text="${product.name}">Game Title</h1>
+
+        <div class="hero-layout">
+            <!-- Media -->
+            <div>
+                <div class="main-media-container">
+                    <img th:src="${product.headerImageUrl}" class="main-image" id="mainImage" th:alt="${product.name}"
+                         onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+                    <video class="main-video" id="mainVideo" controls preload="metadata">
+                        <source th:if="${product.trailerVideoUrl != null}" th:src="${product.trailerVideoUrl}" type="video/webm">
+                    </video>
+                    <div class="media-overlay">
+                        <button class="control-btn" onclick="prevMedia()">◀</button>
+                        <button class="control-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button class="control-btn" onclick="nextMedia()">▶</button>
+                        <span class="media-counter" id="counter">1 / 1</span>
                     </div>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
                 </div>
-                <a th:if="${owned == null}" href="/login" class="btn-buy" th:text="#{game.signtobuy}">Sign in to Buy</a>
-                <div th:if="${owned != null and owned}" class="btn-owned" th:text="#{game.owned}">✓ In your library</div>
-                <a th:if="${owned != null and !owned and inCart}" href="/cart" class="btn-incart" th:text="#{game.incart}">In Cart — View Cart</a>
-                <form th:if="${owned != null and !owned and !inCart}" th:action="@{/cart/add}" method="post">
-                    <input type="hidden" name="productId" th:value="${product.id}">
-                    <button type="submit" class="btn-buy" th:text="#{game.addtocart}">Add to Cart</button>
-                </form>
+                <div class="thumbnail-carousel" id="thumbs"></div>
+            </div>
+
+            <!-- Purchase Box -->
+            <div class="purchase-box">
+                <img th:src="${product.capsuleImageUrl != null ? product.capsuleImageUrl : product.headerImageUrl}"
+                     class="capsule-image" th:alt="${product.name}"
+                     onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+                <p class="short-desc" th:text="${product.description}">Game description</p>
+
+                <div th:if="${product.reviewSummary != null}" class="meta-row">
+                    <span class="label">Reviews:</span>
+                    <span class="review-badge" th:text="${product.reviewSummary}">Very Positive</span>
+                </div>
+                <div th:if="${product.developer != null}" class="meta-row">
+                    <span class="label">Developer:</span>
+                    <span th:text="${product.developer}">Developer</span>
+                </div>
+                <div th:if="${product.publisher != null}" class="meta-row">
+                    <span class="label">Publisher:</span>
+                    <span th:text="${product.publisher}">Publisher</span>
+                </div>
+
+                <div th:if="${product.tags != null}" class="tags">
+                    <a href="#" class="tag" th:each="tag : ${#strings.arraySplit(product.tags, ',')}"
+                       th:text="${#strings.trim(tag)}">Tag</a>
+                </div>
+
+                <div class="buy-section">
+                    <h3>Buy <span th:text="${product.name}">Game</span></h3>
+                    <div th:if="${product.discountPercent > 0}" class="price-with-discount">
+                        <span class="discount-badge" th:text="'-' + ${product.discountPercent} + '%'">-50%</span>
+                        <div class="price-stack">
+                            <span class="original-price" th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}">$59.99</span>
+                            <span class="final-price" th:text="${cSym} + ${#numbers.formatDecimal(product.price * (1 - product.discountPercent / 100.0) * cRate, 1, cDec)}">$29.99</span>
+                        </div>
+                    </div>
+                    <div th:if="${product.discountPercent == 0}">
+                        <span th:if="${product.price > 0}" class="final-price"
+                              th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}">$59.99</span>
+                        <span th:if="${product.price == 0}" class="free-price">Free To Play</span>
+                    </div>
+
+                    <form th:if="${owned == null or !owned}" th:action="@{/cart/add}" method="post" style="margin-top:1rem">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <button type="submit" class="btn-buy">Add to Cart</button>
+                    </form>
+                    <div th:if="${owned != null and owned}" class="btn-owned">✓ Already in your library</div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Content Area -->
+<div class="content-area">
+    <section>
+        <h2>About This Game</h2>
+        <div class="about-content">
+            <p th:text="${product.aboutTheGame != null ? product.aboutTheGame : product.description}">Game description</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>System Requirements</h2>
+        <div class="sys-grid">
+            <div class="sys-col">
+                <h3>MINIMUM:</h3>
+                <ul>
+                    <li><strong>OS:</strong> Windows 10 64-bit</li>
+                    <li><strong>Processor:</strong> Intel Core i5-8400 / AMD Ryzen 3 3300X</li>
+                    <li><strong>Memory:</strong> 12 GB RAM</li>
+                    <li><strong>Graphics:</strong> NVIDIA GTX 1060 3GB / AMD RX 580 4GB</li>
+                    <li><strong>Storage:</strong> 60 GB available space</li>
+                </ul>
+            </div>
+            <div class="sys-col">
+                <h3>RECOMMENDED:</h3>
+                <ul>
+                    <li><strong>OS:</strong> Windows 10/11 64-bit</li>
+                    <li><strong>Processor:</strong> Intel Core i7-8700K / AMD Ryzen 5 3600X</li>
+                    <li><strong>Memory:</strong> 16 GB RAM</li>
+                    <li><strong>Graphics:</strong> NVIDIA GTX 1070 8GB / AMD RX Vega 56 8GB</li>
+                    <li><strong>Storage:</strong> 60 GB available space</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
 <footer>
-    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
+    <span th:text="#{footer.copy}">© 2026 Steam Store</span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}">All rights reserved</span>
 </footer>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+let currentIndex = 0;
+let mediaItems = [];
+const mainImage = document.getElementById('mainImage');
+const mainVideo = document.getElementById('mainVideo');
+const thumbsContainer = document.getElementById('thumbs');
+
+// Initialize
+const headerUrl = /*[[${product.headerImageUrl}]]*/ '';
+const trailerUrl = /*[[${product.trailerVideoUrl}]]*/ null;
+const ss1 = /*[[${product.screenshot1Url}]]*/ null;
+const ss2 = /*[[${product.screenshot2Url}]]*/ null;
+const ss3 = /*[[${product.screenshot3Url}]]*/ null;
+const ss4 = /*[[${product.screenshot4Url}]]*/ null;
+const ss5 = /*[[${product.screenshot5Url}]]*/ null;
+
+if (trailerUrl) mediaItems.push({type:'video', src:trailerUrl});
+if (headerUrl) mediaItems.push({type:'image', src:headerUrl});
+if (ss1) mediaItems.push({type:'image', src:ss1});
+if (ss2) mediaItems.push({type:'image', src:ss2});
+if (ss3) mediaItems.push({type:'image', src:ss3});
+if (ss4) mediaItems.push({type:'image', src:ss4});
+if (ss5) mediaItems.push({type:'image', src:ss5});
+
+// Load thumbnails
+mediaItems.forEach((item, idx) => {
+    const img = document.createElement('img');
+    img.src = item.type === 'video' ? headerUrl : item.src;
+    img.className = 'carousel-thumb' + (idx === 0 ? ' active' : '');
+    img.onclick = () => selectMedia(idx);
+    thumbsContainer.appendChild(img);
+});
+
+function selectMedia(idx) {
+    if (idx < 0 || idx >= mediaItems.length) return;
+    currentIndex = idx;
+    const item = mediaItems[idx];
+
+    document.querySelectorAll('.carousel-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+    });
+
+    if (item.type === 'video') {
+        mainImage.style.display = 'none';
+        mainVideo.style.display = 'block';
+        mainVideo.src = item.src;
+        mainVideo.play();
+        document.getElementById('playBtn').textContent = '⏸';
+    } else {
+        mainVideo.pause();
+        mainVideo.style.display = 'none';
+        mainImage.style.display = 'block';
+        mainImage.src = item.src;
+        document.getElementById('playBtn').textContent = '▶';
+    }
+
+    document.getElementById('counter').textContent = (idx + 1) + ' / ' + mediaItems.length;
+}
+
+function nextMedia() {
+    selectMedia((currentIndex + 1) % mediaItems.length);
+}
+
+function prevMedia() {
+    selectMedia((currentIndex - 1 + mediaItems.length) % mediaItems.length);
+}
+
+function togglePlay() {
+    const item = mediaItems[currentIndex];
+    if (item.type === 'video') {
+        if (mainVideo.paused) {
+            mainVideo.play();
+            document.getElementById('playBtn').textContent = '⏸';
+        } else {
+            mainVideo.pause();
+            document.getElementById('playBtn').textContent = '▶';
+        }
+    }
+}
+
+function toggleFullscreen() {
+    const container = document.querySelector('.main-media-container');
+    if (!document.fullscreenElement) {
+        container.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextMedia();
+    if (e.key === 'ArrowLeft') prevMedia();
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+});
+/*]]>*/
+</script>
 </body>
 </html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' on Steam'">Game on Steam</title>
+    <link rel="stylesheet" href="/css/game-detail.css">
+</head>
+<body>
+<!-- Navigation (same as store page) -->
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="logo">STEAM<span>STORE</span></a>
+        <a href="/store">Store</a>
+        <div class="nav-right">
+            <a href="/dashboard" class="btn-lib">Library</a>
+            <a href="/cart" class="cart-btn">🛒 Cart</a>
+            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+                <option value="en" selected>EN</option>
+            </select>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero">
+    <div class="hero-inner">
+        <div class="breadcrumbs">
+            <a href="/">Home</a> &rsaquo; <a href="/store">Store</a> &rsaquo; <span th:text="${product.name}">Game</span>
+        </div>
+        <h1 class="game-title" th:text="${product.name}">Game Title</h1>
+
+        <div class="hero-layout">
+            <!-- Left: Media Carousel -->
+            <div class="media-section">
+                <div class="main-media-container">
+                    <img th:src="${product.headerImageUrl}" class="main-image" id="mainImage" th:alt="${product.name}">
+                    <video class="main-video" id="mainVideo" controls preload="metadata">
+                        <source th:if="${product.trailerVideoUrl}" th:src="${product.trailerVideoUrl}" type="video/webm">
+                    </video>
+                    <div class="media-overlay">
+                        <button class="control-btn" onclick="prevMedia()">◀</button>
+                        <button class="control-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button class="control-btn" onclick="nextMedia()">▶▶</button>
+                        <span class="media-counter" id="counter">1 / 6</span>
+                    </div>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+                </div>
+                <div class="thumbnail-carousel">
+                    <!-- Thumbnails will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Right: Purchase Box -->
+            <div class="purchase-box">
+                <img th:src="${product.capsuleImageUrl ?: product.headerImageUrl}" class="capsule-image" th:alt="${product.name}">
+                <p class="short-desc" th:text="${product.description}">Game description</p>
+
+                <div class="meta-section">
+                    <div class="meta-row">
+                        <span class="label">Reviews:</span>
+                        <span class="review-badge" th:text="${product.reviewSummary}">Very Positive</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="label">Developer:</span>
+                        <span th:text="${product.developer}">Developer</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="label">Publisher:</span>
+                        <span th:text="${product.publisher}">Publisher</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="label">Release Date:</span>
+                        <span>Available Now</span>
+                    </div>
+                </div>
+
+                <div class="tags-section">
+                    <span>Popular Tags:</span>
+                    <div class="tags">
+                        <a href="#" class="tag" th:each="tag : ${#strings.arraySplit(product.tags ?: '', ',')}"
+                           th:text="${#strings.trim(tag)}">Tag</a>
+                    </div>
+                </div>
+
+                <div class="buy-section">
+                    <h3>Buy <span th:text="${product.name}">Game</span></h3>
+                    <div class="price-box">
+                        <div th:if="${product.discountPercent > 0}" class="price-with-discount">
+                            <span class="discount-badge" th:text="'-' + ${product.discountPercent} + '%'">-50%</span>
+                            <div class="price-stack">
+                                <span class="original-price" th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}">$59.99</span>
+                                <span class="final-price" th:text="${cSym} + ${#numbers.formatDecimal(product.price * (1 - product.discountPercent / 100.0) * cRate, 1, cDec)}">$29.99</span>
+                            </div>
+                        </div>
+                        <div th:if="${product.discountPercent == 0}">
+                            <span class="final-price" th:if="${product.price > 0}"
+                                  th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}">$59.99</span>
+                            <span class="free-price" th:if="${product.price == 0}">Free To Play</span>
+                        </div>
+                    </div>
+
+                    <form th:if="${!owned}" th:action="@{/cart/add}" method="post">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <button type="submit" class="btn-buy">Add to Cart</button>
+                    </form>
+                    <div th:if="${owned}" class="btn-owned">✓ Already in your library</div>
+                </div>
+
+                <!-- Features Box -->
+                <div class="features-box">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>✓ Single Player</li>
+                        <li>✓ Steam Achievements</li>
+                        <li>✓ Full Controller Support</li>
+                        <li>✓ Steam Cloud</li>
+                    </ul>
+                </div>
+
+                <!-- Language Support -->
+                <div class="language-box">
+                    <h4>Languages</h4>
+                    <p>Interface, Audio, Subtitles</p>
+                    <p><strong>English, French, German, Spanish</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="content-area">
+    <div class="content-inner">
+        <!-- Left Column: Main Content -->
+        <div class="main-column">
+            <!-- About Section -->
+            <section class="about-section">
+                <h2>About This Game</h2>
+                <div class="about-content" th:utext="${product.aboutTheGame ?: product.description}">
+                    <p>Game description goes here...</p>
+                </div>
+            </section>
+
+            <!-- System Requirements -->
+            <section class="system-requirements">
+                <h2>System Requirements</h2>
+                <div class="sys-grid">
+                    <div class="sys-col">
+                        <h3>MINIMUM:</h3>
+                        <ul>
+                            <li><strong>OS:</strong> Windows 10 64-bit</li>
+                            <li><strong>Processor:</strong> Intel Core i5-8400 / AMD Ryzen 3 3300X</li>
+                            <li><strong>Memory:</strong> 12 GB RAM</li>
+                            <li><strong>Graphics:</strong> NVIDIA GTX 1060 3GB / AMD RX 580 4GB</li>
+                            <li><strong>DirectX:</strong> Version 12</li>
+                            <li><strong>Storage:</strong> 60 GB available space</li>
+                        </ul>
+                    </div>
+                    <div class="sys-col">
+                        <h3>RECOMMENDED:</h3>
+                        <ul>
+                            <li><strong>OS:</strong> Windows 10/11 64-bit</li>
+                            <li><strong>Processor:</strong> Intel Core i7-8700K / AMD Ryzen 5 3600X</li>
+                            <li><strong>Memory:</strong> 16 GB RAM</li>
+                            <li><strong>Graphics:</strong> NVIDIA GTX 1070 8GB / AMD RX Vega 56 8GB</li>
+                            <li><strong>DirectX:</strong> Version 12</li>
+                            <li><strong>Storage:</strong> 60 GB available space</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section class="reviews-section">
+                <h2>Customer Reviews</h2>
+                <div class="review-summary">
+                    <div class="review-score">
+                        <span class="score-badge" th:text="${product.reviewSummary}">Very Positive</span>
+                        <p>Based on user reviews</p>
+                    </div>
+                </div>
+                <div class="review-placeholder">
+                    <p>Customer reviews coming soon. Check back later!</p>
+                </div>
+            </section>
+
+            <!-- DLC Section -->
+            <section class="dlc-section">
+                <h2>Downloadable Content</h2>
+                <p class="placeholder-text">No DLC available for this game yet.</p>
+            </section>
+
+            <!-- Achievements -->
+            <section class="achievements-section">
+                <h2>Achievements</h2>
+                <div class="achievements-grid">
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🏆</div>
+                        <span>First Steps</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">⭐</div>
+                        <span>Master</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🎯</div>
+                        <span>Perfectionist</span>
+                    </div>
+                    <div class="achievement-item more">
+                        <span>+24 more</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar">
+            <!-- Links Widget -->
+            <div class="widget">
+                <h3>Links</h3>
+                <ul class="link-list">
+                    <li><a href="#">Website</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Forums</a></li>
+                </ul>
+            </div>
+
+            <!-- Related Games -->
+            <div class="widget">
+                <h3>You May Also Like</h3>
+                <div class="related-games">
+                    <a href="#" class="related-item">
+                        <img src="https://via.placeholder.com/200x100" alt="Related Game">
+                        <span class="related-title">Related Game 1</span>
+                        <span class="related-price">$39.99</span>
+                    </a>
+                    <a href="#" class="related-item">
+                        <img src="https://via.placeholder.com/200x100" alt="Related Game">
+                        <span class="related-title">Related Game 2</span>
+                        <span class="related-price">$29.99</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Share Widget -->
+            <div class="widget">
+                <h3>Share</h3>
+                <div class="share-buttons">
+                    <button class="share-btn">Facebook</button>
+                    <button class="share-btn">Twitter</button>
+                    <button class="share-btn">Reddit</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 Steam Store. All rights reserved.</p>
+</footer>
+
+<script src="/js/game-detail.js"></script>
+</body>
+</html>

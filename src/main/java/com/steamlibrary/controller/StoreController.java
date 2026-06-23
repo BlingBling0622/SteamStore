@@ -48,7 +48,7 @@ public class StoreController {
         User user = userService.findByUsername(auth.getName());
         var items = storeService.getCart(user);
         model.addAttribute("cartItems", items);
-        model.addAttribute("cartTotal", storeService.getCartTotal(user));
+        model.addAttribute("cartTotal", storeService.getCartTotal(items)); // reuse fetched items
         model.addAttribute("cartCount", items.size());
         return "cart";
     }

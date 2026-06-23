@@ -1,45 +1,83 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="#{nav.store} + ' - Steam'">Store</title>
+    <title th:text="#{nav.store} + ' - Steam Store'">Store</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df}
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
+        body{font-family:'Motiva Sans','Arial',sans-serif;background:#1b2838;color:#c6d4df;min-height:100vh}
+        nav{background:#171a21;border-bottom:1px solid #000;padding:.75rem 0;position:sticky;top:0;z-index:1000;box-shadow:0 2px 4px rgba(0,0,0,.5)}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
         .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
         .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+        .nav-inner a{color:#b8b6b4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px;transition:all .2s}
         .nav-inner a:hover,.nav-inner a.active{color:#fff;background:rgba(255,255,255,.1)}
         .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-        .btn-lib{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none}
-        .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
+        .btn-lib{padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;text-decoration:none;transition:all .2s}
+        .btn-lib:hover{background:#6d9314}
+        .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem;transition:all .2s}
+        .cart-btn:hover{color:#fff}
         .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
-        .lang-select:focus{outline:none;border-color:#66c0f4}
-        .main{max-width:1200px;margin:2rem auto;padding:0 20px}
-        .page-header{margin-bottom:1.5rem;border-bottom:1px solid #2a475e;padding-bottom:1rem}
-        .page-header h1{font-size:1.5rem;color:#fff;font-weight:700}
-        .page-header p{color:#8f98a0;font-size:.875rem;margin-top:.25rem}
-        .game-list{display:flex;flex-direction:column;gap:1px;background:#2a475e}
-        .game-row{display:flex;background:#1b2838;text-decoration:none;color:inherit;transition:background .15s}
+
+        .container{max-width:1200px;margin:0 auto;padding:1.5rem 20px}
+        .breadcrumbs{font-size:.85rem;color:#8f98a0;margin-bottom:1rem}
+        .breadcrumbs a{color:#66c0f4;text-decoration:none}
+        .breadcrumbs a:hover{color:#fff}
+
+        .page-header{margin-bottom:2rem}
+        .page-header h1{font-size:2rem;color:#fff;font-weight:300;margin-bottom:.5rem}
+        .page-header .subtitle{color:#8f98a0;font-size:.95rem}
+
+        .filter-bar{background:#16202d;border:1px solid #000;border-radius:3px;padding:1rem;margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+        .filter-section{display:flex;align-items:center;gap:.5rem}
+        .filter-label{color:#8f98a0;font-size:.85rem;font-weight:600;text-transform:uppercase}
+        .filter-btn{padding:.4rem .75rem;background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;border-radius:2px;font-size:.85rem;cursor:pointer;transition:all .2s}
+        .filter-btn:hover,.filter-btn.active{background:#66c0f4;color:#fff;border-color:#66c0f4}
+        .search-box{flex:1;min-width:250px}
+        .search-box input{width:100%;padding:.5rem .75rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
+        .search-box input:focus{outline:none;border-color:#66c0f4}
+
+        .view-toggle{display:flex;gap:.25rem;margin-left:auto}
+        .view-toggle button{width:32px;height:32px;background:#2a475e;border:1px solid #4b6a88;color:#8f98a0;cursor:pointer;border-radius:2px;transition:all .2s}
+        .view-toggle button:hover,.view-toggle button.active{background:#66c0f4;color:#fff;border-color:#66c0f4}
+
+        .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem}
+        .game-card{background:#16202d;border-radius:4px;overflow:hidden;transition:all .3s;cursor:pointer;text-decoration:none;color:inherit;display:block;position:relative}
+        .game-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.8)}
+        .game-card-image{width:100%;height:132px;object-fit:cover;display:block}
+        .game-card-body{padding:1rem}
+        .game-card-title{font-size:1rem;color:#fff;font-weight:600;margin-bottom:.5rem;line-height:1.3}
+        .game-card-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+        .tag{background:rgba(103,193,245,.2);color:#67c1f5;padding:.2rem .4rem;border-radius:2px;font-size:.7rem}
+        .game-card-review{font-size:.8rem;color:#66c0f4;margin-bottom:.5rem}
+        .game-card-review.overwhelm{color:#a4d007}
+        .game-card-price{display:flex;align-items:center;gap:.5rem}
+        .discount-badge{background:#4c6b22;color:#a4d007;padding:.25rem .5rem;border-radius:2px;font-size:.85rem;font-weight:700}
+        .price-old{text-decoration:line-through;color:#8f98a0;font-size:.85rem}
+        .price-new{color:#a4d007;font-size:1.1rem;font-weight:700}
+        .price-free{color:#a4d007;font-size:1.1rem;font-weight:700}
+        .owned-badge{position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.8);color:#a4d007;padding:.3rem .6rem;border-radius:2px;font-size:.75rem;font-weight:700}
+
+        .game-list{display:flex;flex-direction:column;gap:1px;background:#2a475e;display:none}
+        .game-list.active{display:flex}
+        .game-row{display:flex;background:#16202d;text-decoration:none;color:inherit;transition:all .2s;align-items:center;padding:.75rem}
         .game-row:hover{background:#2a475e}
-        .game-row img{width:184px;height:69px;object-fit:cover;flex-shrink:0}
-        .game-row-info{flex:1;padding:.75rem 1rem;display:flex;align-items:center;gap:1rem}
-        .game-row-name{flex:1;color:#fff;font-weight:700;font-size:.95rem}
-        .game-row-tags{flex:1;display:flex;gap:.3rem;flex-wrap:wrap}
-        .tag{background:rgba(103,193,245,.1);color:#66c0f4;padding:.15rem .5rem;border-radius:2px;font-size:.75rem}
-        .game-row-review{width:160px;font-size:.8rem;flex-shrink:0}
-        .review-pos{color:#66c0f4}
-        .review-overwhelm{color:#a4d007}
-        .game-row-price{width:130px;text-align:right;flex-shrink:0}
-        .badge-discount{display:inline-block;background:#4c6b22;color:#a4d007;padding:.15rem .4rem;border-radius:2px;font-size:.75rem;font-weight:700;margin-bottom:.2rem}
-        .price-old{text-decoration:line-through;color:#8f98a0;font-size:.75rem;display:block}
-        .price-new{color:#acdbf5;font-size:.9rem;font-weight:700}
-        .price-free{color:#a4d007;font-size:.9rem;font-weight:700}
-        footer{background:#171d25;border-top:1px solid #2a475e;padding:2rem 20px;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:3rem}
-        @media(max-width:768px){.game-row-tags,.game-row-review{display:none}.game-row img{width:120px;height:45px}}
+        .game-row-image{width:184px;height:69px;object-fit:cover;flex-shrink:0;border-radius:2px}
+        .game-row-info{flex:1;padding:0 1rem;display:flex;align-items:center;gap:1rem}
+        .game-row-name{flex:1;color:#fff;font-weight:600;font-size:.95rem;min-width:200px}
+        .game-row-tags{flex:1;display:flex;gap:.3rem;flex-wrap:wrap;min-width:180px}
+        .game-row-review{width:140px;font-size:.8rem;flex-shrink:0}
+        .game-row-price{width:120px;text-align:right;flex-shrink:0}
+
+        footer{background:#171a21;border-top:1px solid #000;padding:2rem;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:3rem}
+
+        @media(max-width:768px){
+            .game-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
+            .filter-bar{flex-direction:column;align-items:stretch}
+            .game-row-tags,.game-row-review{display:none}
+        }
     </style>
 </head>
 <body>
@@ -65,39 +103,146 @@
         </div>
     </div>
 </nav>
-<div class="main">
-    <div class="page-header">
-        <h1 th:text="#{store.allgames}">All Games</h1>
-        <p th:text="${products.size()} + ' ' + #{store.results}"></p>
+
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="/">Home</a> &rsaquo; <span>Store</span>
     </div>
-    <div class="game-list">
-        <a class="game-row" th:each="p : ${products}" th:href="@{/store/game/{id}(id=${p.id})}">
-            <img th:src="${p.headerImageUrl}" th:alt="${p.name}">
+
+    <div class="page-header">
+        <h1>Browse All Games</h1>
+        <p class="subtitle" th:text="${products.size()} + ' games available'">130 games available</p>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-section">
+            <span class="filter-label">Filter:</span>
+            <button class="filter-btn active" onclick="filterGames('all')">All</button>
+            <button class="filter-btn" onclick="filterGames('action')">Action</button>
+            <button class="filter-btn" onclick="filterGames('rpg')">RPG</button>
+            <button class="filter-btn" onclick="filterGames('strategy')">Strategy</button>
+            <button class="filter-btn" onclick="filterGames('indie')">Indie</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" placeholder="Search games..." id="searchInput" onkeyup="searchGames()">
+        </div>
+
+        <div class="view-toggle">
+            <button class="active" onclick="switchView('grid')" title="Grid View">⊞</button>
+            <button onclick="switchView('list')" title="List View">☰</button>
+        </div>
+    </div>
+
+    <!-- Game Grid View -->
+    <div class="game-grid" id="gameGrid">
+        <a th:each="p : ${products}"
+           th:href="@{/store/game/{id}(id=${p.id})}"
+           class="game-card"
+           th:attr="data-tags=${p.tags != null ? #strings.toLowerCase(p.tags) : ''}, data-name=${#strings.toLowerCase(p.name)}">
+            <img th:src="${p.headerImageUrl}" th:alt="${p.name}" class="game-card-image"
+                 onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+            <div class="game-card-body">
+                <h3 class="game-card-title" th:text="${p.name}">Game Title</h3>
+                <div class="game-card-tags">
+                    <span class="tag"
+                          th:each="tag : ${#strings.arraySplit(p.tags != null ? p.tags : '', ',')}"
+                          th:text="${#strings.trim(tag)}">Tag</span>
+                </div>
+                <div th:if="${p.reviewSummary != null}"
+                     class="game-card-review"
+                     th:classappend="${#strings.contains(p.reviewSummary, 'Overwhelmingly') ? 'overwhelm' : ''}"
+                     th:text="${p.reviewSummary}">Very Positive</div>
+                <div class="game-card-price">
+                    <span th:if="${p.discountPercent > 0}" class="discount-badge" th:text="'-' + ${p.discountPercent} + '%'">-50%</span>
+                    <span th:if="${p.discountPercent > 0}" class="price-old"
+                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}">$59.99</span>
+                    <span th:if="${p.price == 0}" class="price-free">Free To Play</span>
+                    <span th:if="${p.price > 0}" class="price-new"
+                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}">$29.99</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Game List View -->
+    <div class="game-list" id="gameList">
+        <a th:each="p : ${products}"
+           th:href="@{/store/game/{id}(id=${p.id})}"
+           class="game-row"
+           th:attr="data-tags=${p.tags != null ? #strings.toLowerCase(p.tags) : ''}, data-name=${#strings.toLowerCase(p.name)}">
+            <img th:src="${p.headerImageUrl}" th:alt="${p.name}" class="game-row-image"
+                 onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
             <div class="game-row-info">
-                <span class="game-row-name" th:text="${p.name}"></span>
+                <span class="game-row-name" th:text="${p.name}">Game Name</span>
                 <div class="game-row-tags">
-                    <span class="tag" th:each="tag : ${#strings.arraySplit(p.tags, ',')}" th:text="${#strings.trim(tag)}"></span>
+                    <span class="tag"
+                          th:each="tag : ${#strings.arraySplit(p.tags != null ? p.tags : '', ',')}"
+                          th:text="${#strings.trim(tag)}">Tag</span>
                 </div>
-                <div class="game-row-review">
-                    <span class="review-overwhelm" th:if="${p.reviewSummary != null and #strings.contains(p.reviewSummary,'Overwhelmingly')}" th:text="${p.reviewSummary}"></span>
-                    <span class="review-pos"        th:if="${p.reviewSummary != null and !#strings.contains(p.reviewSummary,'Overwhelmingly')}" th:text="${p.reviewSummary}"></span>
-                </div>
+                <div class="game-row-review" th:text="${p.reviewSummary}">Very Positive</div>
                 <div class="game-row-price">
-                    <span class="badge-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
-                    <span class="price-old"  th:if="${p.discountPercent > 0}"
+                    <span th:if="${p.discountPercent > 0}" class="discount-badge" th:text="'-' + ${p.discountPercent} + '%'"></span>
+                    <span th:if="${p.discountPercent > 0}" class="price-old"
                           th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
-                    <span class="price-free" th:if="${p.price == 0}" th:text="#{store.free}">Free</span>
-                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent > 0}"
+                    <span th:if="${p.price == 0}" class="price-free">Free</span>
+                    <span th:if="${p.price > 0}" class="price-new"
                           th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
-                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent == 0}"
-                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
                 </div>
             </div>
         </a>
     </div>
 </div>
+
 <footer>
     <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
 </footer>
+
+<script>
+function searchGames() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.game-card, .game-row');
+
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        card.style.display = name.includes(input) ? '' : 'none';
+    });
+}
+
+function filterGames(genre) {
+    const cards = document.querySelectorAll('.game-card, .game-row');
+    const buttons = document.querySelectorAll('.filter-btn');
+
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (genre === 'all') {
+        cards.forEach(card => card.style.display = '');
+        return;
+    }
+
+    cards.forEach(card => {
+        const tags = card.getAttribute('data-tags') || '';
+        card.style.display = tags.includes(genre.toLowerCase()) ? '' : 'none';
+    });
+}
+
+function switchView(view) {
+    const grid = document.getElementById('gameGrid');
+    const list = document.getElementById('gameList');
+    const buttons = document.querySelectorAll('.view-toggle button');
+
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (view === 'grid') {
+        grid.style.display = 'grid';
+        list.classList.remove('active');
+    } else {
+        grid.style.display = 'none';
+        list.classList.add('active');
+    }
+}
+</script>
 </body>
 </html>
