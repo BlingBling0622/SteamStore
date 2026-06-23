@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{cart.title} + ' - Steam'">Cart</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
+        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
+        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
+        .logo span{color:#66c0f4}
+        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+        .nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
+        .nav-right{margin-left:auto}
+        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
+        .lang-select:focus{outline:none;border-color:#66c0f4}
+        .main{max-width:900px;margin:2rem auto;padding:0 20px;flex:1;width:100%}
+        .page-title{font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:1.5rem}
+        .empty{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;padding:3rem;text-align:center}
+        .empty p{color:#8f98a0;font-size:1rem;margin-bottom:1rem}
+        .empty a{color:#66c0f4;text-decoration:none}
+        .cart-items{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;overflow:hidden;margin-bottom:1.5rem}
+        .cart-item{display:flex;gap:1rem;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid #4b6a88}
+        .cart-item:last-child{border-bottom:none}
+        .cart-item img{width:120px;height:45px;object-fit:cover;border-radius:2px;flex-shrink:0}
+        .item-name{flex:1;color:#fff;font-weight:700;font-size:.9rem;text-decoration:none}
+        .item-name:hover{color:#66c0f4}
+        .item-price{color:#acdbf5;font-size:.95rem;font-weight:700;width:100px;text-align:right;flex-shrink:0}
+        .btn-remove{background:none;border:none;color:#8f98a0;font-size:.8rem;cursor:pointer;padding:.25rem .5rem;border-radius:2px}
+        .btn-remove:hover{color:#c44;background:rgba(204,68,68,.1)}
+        .checkout-row{display:flex;justify-content:flex-end;align-items:center;gap:1.5rem}
+        .total-label{color:#8f98a0;font-size:.9rem}
+        .total-amount{color:#fff;font-size:1.5rem;font-weight:700}
+        .btn-checkout{padding:.875rem 2rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-weight:700;font-size:1rem;border:none;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+        .btn-checkout:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
+        footer{background:#171d25;border-top:1px solid #2a475e;padding:1.5rem;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:auto}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="logo">STEAM<span>STORE</span></a>
+        <a href="/store" th:text="#{nav.store}">Store</a>
+        <a href="/dashboard" th:text="#{nav.library}">Library</a>
+        <div class="nav-right">
+            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
+                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
+                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
+                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
+                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
+                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
+                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
+                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
+            </select>
+        </div>
+    </div>
+</nav>
+<div class="main">
+    <div class="page-title" th:text="#{cart.title}">Shopping Cart</div>
+
+    <div th:if="${cartItems.isEmpty()}" class="empty">
+        <p th:text="#{cart.empty}">Your cart is empty.</p>
+        <a href="/store" th:text="#{cart.browse}">Browse the Store</a>
+    </div>
+
+    <div th:if="${!cartItems.isEmpty()}">
+        <div class="cart-items">
+            <div class="cart-item" th:each="item : ${cartItems}">
+                <img th:src="${item.product.headerImageUrl}" th:alt="${item.product.name}">
+                <a th:href="@{/store/game/{id}(id=${item.product.id})}" class="item-name" th:text="${item.product.name}"></a>
+                <div class="item-price">
+                    <span th:if="${item.product.price == 0}" th:text="#{store.free}">Free</span>
+                    <span th:if="${item.product.price > 0}"
+                          th:text="${cSym} + ${#numbers.formatDecimal(item.effectivePrice * cRate, 1, cDec)}"></span>
+                </div>
+                <form th:action="@{/cart/remove}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                    <button type="submit" class="btn-remove" th:text="#{cart.remove}">Remove</button>
+                </form>
+            </div>
+        </div>
+        <div class="checkout-row">
+            <div>
+                <div class="total-label" th:text="#{cart.total}">Estimated total</div>
+                <div class="total-amount"
+                     th:text="${cSym} + ${#numbers.formatDecimal(cartTotal * cRate, 1, cDec)}"></div>
+            </div>
+            <form th:action="@{/checkout}" method="post">
+                <button type="submit" class="btn-checkout" th:text="#{cart.checkout}">Purchase for Myself</button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer>
+    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
+</footer>
+</body>
+</html>

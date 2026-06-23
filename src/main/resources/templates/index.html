@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Store</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df}
+        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
+        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
+        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
+        .logo span{color:#66c0f4}
+        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+        .nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
+        .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+        .btn-nav{padding:.4rem 1rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase}
+        .btn-nav:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
+        .btn-login{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none}
+        .btn-login:hover{background:linear-gradient(to bottom,#316282,#234e6b)}
+        .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
+        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
+        .lang-select:focus{outline:none;border-color:#66c0f4}
+        .hero{background:linear-gradient(to bottom,#2a475e,#1b2838);border-bottom:1px solid #2a475e}
+        .hero-inner{max-width:1200px;margin:0 auto;padding:2rem 20px}
+        .section-label{font-size:.85rem;color:#8f98a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+        .section-label a{color:#66c0f4;text-decoration:none;font-size:.8rem}
+        .featured-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem}
+        .featured-main{position:relative;border-radius:3px;overflow:hidden;cursor:pointer;text-decoration:none;display:block}
+        .featured-main img{width:100%;height:280px;object-fit:cover;display:block}
+        .featured-main-info{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+        .featured-main-info h3{font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:.5rem}
+        .tags{display:flex;gap:.4rem;flex-wrap:wrap}
+        .tag{background:rgba(103,193,245,.15);color:#66c0f4;padding:.2rem .6rem;border-radius:2px;font-size:.75rem}
+        .featured-side{display:flex;flex-direction:column;gap:.5rem}
+        .side-item{display:flex;gap:.75rem;align-items:center;background:#16202d;border:1px solid #2a475e;border-radius:3px;padding:.75rem;text-decoration:none;color:inherit;transition:background .15s}
+        .side-item:hover{background:#2a475e}
+        .side-item img{width:100px;height:56px;object-fit:cover;border-radius:2px;flex-shrink:0}
+        .side-item-info{flex:1;min-width:0}
+        .side-item-info h4{font-size:.9rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.25rem}
+        .side-price{font-size:.85rem;font-weight:700;color:#acdbf5;white-space:nowrap}
+        .badge-discount{background:#4c6b22;color:#a4d007;padding:.1rem .4rem;border-radius:2px;font-size:.75rem;font-weight:700}
+        .section{max-width:1200px;margin:2rem auto;padding:0 20px}
+        .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+        .game-card{background:#16202d;border:1px solid #2a475e;border-radius:3px;overflow:hidden;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:block}
+        .game-card:hover{border-color:#66c0f4;transform:translateY(-2px)}
+        .game-card img{width:100%;height:90px;object-fit:cover;display:block}
+        .game-card-body{padding:.6rem}
+        .game-card-body h4{font-size:.85rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.4rem}
+        .price-row{display:flex;align-items:center;gap:.4rem}
+        .price-old{text-decoration:line-through;color:#8f98a0;font-size:.75rem}
+        .price-new{color:#acdbf5;font-size:.85rem;font-weight:700}
+        .price-free{color:#a4d007;font-size:.85rem;font-weight:700}
+        footer{background:#171d25;border-top:1px solid #2a475e;padding:2rem 20px;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:3rem}
+        @media(max-width:768px){.featured-grid{grid-template-columns:1fr}.game-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="logo">STEAM<span>STORE</span></a>
+        <a href="/store" th:text="#{nav.store}">Store</a>
+        <div class="nav-right">
+            <a href="/dashboard" class="btn-login" th:text="#{nav.library}">Library</a>
+            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span></a>
+            <a href="/login" class="btn-login" th:text="#{nav.signin}">Sign In</a>
+            <a href="/register" class="btn-nav" th:text="#{nav.joinfree}">Join Free</a>
+            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
+                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
+                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
+                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
+                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
+                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
+                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
+                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
+            </select>
+        </div>
+    </div>
+</nav>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div class="section-label"><span th:text="#{store.featured}">Featured</span></div>
+        <div class="featured-grid" th:if="${!featured.isEmpty()}">
+            <a th:href="@{/store/game/{id}(id=${featured[0].id})}" class="featured-main">
+                <img th:src="${featured[0].headerImageUrl}" th:alt="${featured[0].name}">
+                <div class="featured-main-info">
+                    <h3 th:text="${featured[0].name}"></h3>
+                    <div class="tags">
+                        <span class="tag" th:each="tag : ${#strings.arraySplit(featured[0].tags, ',')}" th:text="${#strings.trim(tag)}"></span>
+                    </div>
+                </div>
+            </a>
+            <div class="featured-side">
+                <a th:each="p,i : ${featured}" th:if="${i.index > 0 and i.index <= 4}"
+                   th:href="@{/store/game/{id}(id=${p.id})}" class="side-item">
+                    <img th:src="${p.headerImageUrl}" th:alt="${p.name}">
+                    <div class="side-item-info">
+                        <h4 th:text="${p.name}"></h4>
+                        <div class="price-row">
+                            <span class="badge-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
+                            <span class="price-free" th:if="${p.price == 0}" th:text="#{store.free}">Free</span>
+                            <span class="price-new" th:if="${p.price > 0 and p.discountPercent > 0}"
+                                  th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
+                            <span class="price-new" th:if="${p.price > 0 and p.discountPercent == 0}"
+                                  th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-label">
+        <span th:text="#{store.browse}">Browse the Store</span>
+        <a href="/store" th:text="#{store.seeall}">See all →</a>
+    </div>
+    <div class="game-grid">
+        <a class="game-card" th:each="p : ${allProducts}" th:href="@{/store/game/{id}(id=${p.id})}">
+            <img th:src="${p.headerImageUrl}" th:alt="${p.name}">
+            <div class="game-card-body">
+                <h4 th:text="${p.name}"></h4>
+                <div class="price-row">
+                    <span class="badge-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
+                    <span class="price-old"  th:if="${p.discountPercent > 0}"
+                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
+                    <span class="price-free" th:if="${p.price == 0}" th:text="#{store.free}">Free</span>
+                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent > 0}"
+                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
+                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent == 0}"
+                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<footer>
+    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
+</footer>
+</body>
+</html>

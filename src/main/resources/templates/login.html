@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{login.title} + ' - Steam'">Sign In</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0}
+        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:2rem}
+        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;letter-spacing:-.5px}
+        .logo span{color:#66c0f4}
+        nav a{color:#c6d4df;text-decoration:none;font-size:.9rem}
+        nav a:hover{color:#66c0f4}
+        .nav-right{margin-left:auto}
+        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
+        .lang-select:focus{outline:none;border-color:#66c0f4}
+        .center{flex:1;display:flex;justify-content:center;align-items:center;padding:3rem 20px}
+        .card{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;padding:2.5rem;width:100%;max-width:420px}
+        .card h1{font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.05em}
+        .form-group{margin-bottom:1.25rem}
+        .form-group label{display:block;font-size:.85rem;color:#c6d4df;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em}
+        .form-group input{width:100%;padding:.75rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;font-size:.95rem;border-radius:2px;outline:none}
+        .form-group input:focus{border-color:#66c0f4}
+        .btn-green{width:100%;padding:.875rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-weight:700;font-size:1rem;border:none;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+        .btn-green:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
+        .alert{padding:.875rem;border-radius:2px;margin-bottom:1.25rem;font-size:.9rem}
+        .alert-error{background:rgba(180,40,40,.15);border:1px solid #c44;color:#f6b4b4}
+        .alert-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007}
+        .divider{text-align:center;color:#8f98a0;margin:1.25rem 0;font-size:.85rem}
+        .link{text-align:center;color:#8f98a0;font-size:.875rem}
+        .link a{color:#66c0f4;text-decoration:none}
+        .link a:hover{text-decoration:underline}
+        footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.5rem;color:#8f98a0;font-size:.8rem;margin-top:auto}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="logo">STEAM<span>STORE</span></a>
+        <a href="/store" th:text="#{nav.store}">Store</a>
+        <div class="nav-right">
+            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
+                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
+                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
+                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
+                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
+                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
+                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
+                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
+            </select>
+        </div>
+    </div>
+</nav>
+<div class="center">
+    <div class="card">
+        <h1 th:text="#{login.title}">Sign In</h1>
+        <div th:if="${param.registered}" class="alert alert-success" th:text="#{login.registered}"></div>
+        <div th:if="${param.logout}" class="alert alert-success" th:text="#{login.loggedout}"></div>
+        <div th:if="${param.error}" class="alert alert-error" th:text="#{login.incorrect}"></div>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username" th:text="#{login.username}">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password" th:text="#{login.password}">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-green" th:text="#{login.submit}">Sign In</button>
+        </form>
+        <div class="divider">— or —</div>
+        <div class="link">
+            <span th:text="#{login.newhere}">New here?</span>
+            <a href="/register" th:text="#{login.create}">Create a free account</a>
+        </div>
+    </div>
+</div>
+<footer>
+    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
+</footer>
+</body>
+</html>
