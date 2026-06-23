@@ -1,0 +1,5 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "java -Xmx512m -jar target/steam-library-app-1.0.0.jar"
