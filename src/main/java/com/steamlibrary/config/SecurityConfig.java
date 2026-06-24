@@ -21,10 +21,12 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
         http
+            .authenticationProvider(authenticationProvider)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/store", "/store/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/store", "/store/**", "/register", "/login", "/css/**", "/js/**", "/images/**", "/debug/**").permitAll()
+                .requestMatchers("/auth/steam/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
@@ -37,13 +39,8 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            .sessionManagement(session -> session
-                .sessionFixation().migrateSession()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-            )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
+                .ignoringRequestMatchers("/h2-console/**", "/store/**", "/debug/**", "/dashboard/favorite", "/cart/**", "/checkout")
             )
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
@@ -58,11 +55,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public DaoAuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
     @Bean

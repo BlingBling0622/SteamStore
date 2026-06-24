@@ -39,13 +39,20 @@
     </style>
 </head>
 <body>
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" th:text="#{nav.store}">Store</a>
-        <a href="/dashboard" th:text="#{nav.library}">Library</a>
-        <div class="nav-right">
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
+        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
+            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none">Sign In</a>
+            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
                 <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
@@ -70,7 +77,10 @@
         <div class="cart-items">
             <div class="cart-item" th:each="item : ${cartItems}">
                 <img th:src="${item.product.headerImageUrl}" th:alt="${item.product.name}">
-                <a th:href="@{/store/game/{id}(id=${item.product.id})}" class="item-name" th:text="${item.product.name}"></a>
+                <div>
+                    <a th:href="@{/store/game/{id}(id=${item.product.id})}" class="item-name" th:text="${item.product.name}"></a>
+                    <div th:if="${ownedIds != null and ownedIds.contains(item.product.id)}" style="font-size:.75rem;color:#a4d007;margin-top:.15rem">Already in your library — can still purchase as gift</div>
+                </div>
                 <div class="item-price">
                     <span th:if="${item.product.price == 0}" th:text="#{store.free}">Free</span>
                     <span th:if="${item.product.price > 0}"
@@ -82,13 +92,14 @@
                 </form>
             </div>
         </div>
+        <a href="#" onclick="if(document.referrer) { history.back(); } else { location.href='/store'; }; return false;" style="display:inline-block;padding:.6rem 1.2rem;background:#2a475e;color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none;margin-top:1rem">← Continue Shopping</a>
         <div class="checkout-row">
             <div>
                 <div class="total-label" th:text="#{cart.total}">Estimated total</div>
                 <div class="total-amount"
                      th:text="${cSym} + ${#numbers.formatDecimal(cartTotal * cRate, 1, cDec)}"></div>
             </div>
-            <form th:action="@{/checkout}" method="post">
+            <form action="/checkout" method="post">
                 <button type="submit" class="btn-checkout" th:text="#{cart.checkout}">Purchase for Myself</button>
             </form>
         </div>

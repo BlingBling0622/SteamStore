@@ -48,9 +48,19 @@ public class StoreController {
         User user = userService.findByUsername(auth.getName());
         var items = storeService.getCart(user);
         model.addAttribute("cartItems", items);
-        model.addAttribute("cartTotal", storeService.getCartTotal(items)); // reuse fetched items
+        model.addAttribute("cartTotal", storeService.getCartTotal(items));
         model.addAttribute("cartCount", items.size());
+        model.addAttribute("ownedIds", storeService.getOwnedProductIds(user));
         return "cart";
+    }
+
+    @PostMapping("/store/claim-free")
+    public String claimFree(@RequestParam Long productId, Authentication auth,
+                            RedirectAttributes ra) {
+        User user = userService.findByUsername(auth.getName());
+        storeService.claimFree(user, productId);
+        ra.addFlashAttribute("success", "Game added to your library!");
+        return "redirect:/store/game/" + productId;
     }
 
     @PostMapping("/cart/add")
@@ -58,8 +68,7 @@ public class StoreController {
                             RedirectAttributes ra) {
         User user = userService.findByUsername(auth.getName());
         storeService.addToCart(user, productId);
-        ra.addFlashAttribute("success", "Added to cart!");
-        return "redirect:/store/game/" + productId;
+        return "redirect:/cart";
     }
 
     @PostMapping("/cart/remove")

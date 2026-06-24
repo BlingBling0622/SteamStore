@@ -58,19 +58,43 @@ public class StoreService {
         List<CartItem> items = cartRepository.findByUser(user);
         if (items.isEmpty()) throw new IllegalStateException("Cart is empty");
 
+        Set<Long> owned = getOwnedProductIds(user);
+        List<Product> newProducts = items.stream()
+                .map(CartItem::getProduct)
+                .filter(p -> !owned.contains(p.getId()))
+                .collect(Collectors.toList());
+        int skipped = items.size() - newProducts.size();
+
         double total = items.stream().mapToDouble(CartItem::getEffectivePrice).sum();
-        List<Product> products = items.stream().map(CartItem::getProduct).collect(Collectors.toList());
+        List<Product> allProducts = items.stream().map(CartItem::getProduct).collect(Collectors.toList());
 
         Order order = new Order();
         order.setUser(user);
-        order.setProducts(products);
+        order.setProducts(allProducts);
         order.setTotal(total);
         orderRepository.save(order);
 
         cartRepository.deleteByUser(user);
 
-        log.info("Order created: user={}, products={}, total={}", user.getUsername(), products.size(), total);
+        log.info("Order created: user={}, products={}, new={}, skipped={}, total={}",
+                user.getUsername(), allProducts.size(), newProducts.size(), skipped, total);
         return order;
+    }
+
+    /** Claim a free game directly */
+    @Transactional
+    public void claimFree(User user, Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        if (product.getPrice() > 0) throw new IllegalStateException("Not a free game");
+        if (getOwnedProductIds(user).contains(productId)) return; // already owned
+        // Remove from cart if present
+        cartRepository.findByUserAndProductId(user, productId).ifPresent(cartRepository::delete);
+        Order order = new Order();
+        order.setUser(user);
+        order.setProducts(List.of(product));
+        order.setTotal(0.0);
+        orderRepository.save(order);
+        log.info("Free game claimed: user={}, game={}", user.getUsername(), product.getName());
     }
 
     /** IDs of products already owned by this user */
@@ -86,6 +110,13 @@ public class StoreService {
 
         log.debug("User {} owns {} unique products", user.getUsername(), ownedIds.size());
         return ownedIds;
+    }
+
+    /** Total spent by this user across all orders */
+    @Transactional(readOnly = true)
+    public double getTotalSpent(User user) {
+        return orderRepository.findByUser(user).stream()
+                .mapToDouble(Order::getTotal).sum();
     }
 
     /** Get all purchased products for this user */

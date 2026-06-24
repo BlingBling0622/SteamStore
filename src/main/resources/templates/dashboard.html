@@ -1,106 +1,91 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="#{dashboard.title} + ' - Steam'">Library</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Motiva Sans','Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library - Steam</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+.container{display:flex;flex:1}
 
-        /* Navigation */
-        nav{background:#171a21;border-bottom:1px solid #000;padding:.75rem 0}
-        .nav-inner{max-width:100%;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
-        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
-        .logo span{color:#66c0f4}
-        .nav-inner a{color:#b8b6b4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
-        .nav-inner a:hover,.nav-inner a.active{color:#fff;background:rgba(255,255,255,.1)}
-        .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-        .btn-logout{padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer}
-        .btn-logout:hover{background:#6d9314}
-        .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
-        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
+/* Sidebar */
+.sidebar{width:220px;background:#16202d;padding:1rem;border-right:1px solid #000;overflow-y:auto;flex-shrink:0}
+.sidebar h3{font-size:.7rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 .5rem;font-weight:600}
+.sidebar h3:first-child{margin-top:0}
+.sidebar ul{list-style:none}
+.sidebar li{margin-bottom:2px}
+.sidebar a{display:flex;justify-content:space-between;align-items:center;color:#c6d4df;text-decoration:none;padding:.35rem .5rem;border-radius:2px;font-size:.85rem;transition:.15s}
+.sidebar a:hover{background:rgba(103,193,245,.15);color:#66c0f4}
+.sidebar a.active{background:#66c0f4;color:#fff}
+.sidebar .badge{font-size:.7rem;color:#8f98a0;background:#1b2838;padding:.1rem .35rem;border-radius:8px}
+.sidebar a.active .badge{background:rgba(0,0,0,.3);color:#fff}
 
-        /* Main Layout */
-        .container{display:flex;flex:1}
+/* Main */
+.main-content{flex:1;padding:1.5rem 2rem;overflow-y:auto}
 
-        /* Sidebar */
-        .sidebar{width:240px;background:#16202d;padding:1rem;border-right:1px solid #000;overflow-y:auto}
-        .sidebar h3{font-size:.75rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;font-weight:600}
-        .sidebar ul{list-style:none;margin-bottom:1.5rem}
-        .sidebar li{margin-bottom:.25rem}
-        .sidebar a{display:block;color:#c6d4df;text-decoration:none;padding:.4rem .5rem;border-radius:2px;font-size:.875rem;transition:all .2s}
-        .sidebar a:hover{background:rgba(103,193,245,.2);color:#66c0f4}
-        .sidebar a.active{background:#66c0f4;color:#fff}
-        .filter-item{display:flex;justify-content:space-between;align-items:center}
-        .count{font-size:.75rem;color:#8f98a0;background:#1b2838;padding:.1rem .4rem;border-radius:10px}
+/* Stats */
+.stats{display:flex;gap:1rem;margin-bottom:1.5rem}
+.stat-card{flex:1;background:#16202d;padding:1rem;border-radius:4px;border:1px solid #000}
+.stat-card .label{font-size:.7rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem}
+.stat-card .value{font-size:1.5rem;color:#66c0f4;font-weight:300}
 
-        /* Main Content */
-        .main-content{flex:1;padding:1.5rem 2rem;overflow-y:auto}
+/* Search */
+.search-bar{margin-bottom:1.5rem}
+.search-bar input{width:100%;max-width:350px;padding:.55rem .8rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
+.search-bar input:focus{outline:none;border-color:#66c0f4}
 
-        /* Header */
-        .page-header{margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
-        .page-header h1{font-size:1.75rem;color:#fff;font-weight:300}
-        .view-options{display:flex;gap:.5rem}
-        .view-btn{padding:.5rem;background:#2a475e;border:1px solid #4b6a88;color:#8f98a0;cursor:pointer;border-radius:2px}
-        .view-btn:hover,.view-btn.active{background:#66c0f4;color:#fff;border-color:#66c0f4}
+/* Game Grid */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem}
+.game-card{background:#16202d;border-radius:4px;overflow:hidden;text-decoration:none;color:inherit;display:block;position:relative;transition:all .2s}
+.game-card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,.5)}
+.game-card.hidden{display:none}
+.game-card img{width:100%;height:145px;object-fit:cover;display:block}
+.game-info{padding:.75rem .85rem}
+.game-info h4{font-size:.9rem;color:#fff;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.2rem}
+.game-meta{font-size:.78rem;color:#8f98a0}
 
-        /* Search Bar */
-        .search-bar{margin-bottom:1.5rem}
-        .search-bar input{width:100%;max-width:400px;padding:.6rem 1rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
-        .search-bar input:focus{outline:none;border-color:#66c0f4;background:#2a475e}
+/* Favorite button */
+.fav-btn{position:absolute;top:.35rem;right:.35rem;width:26px;height:26px;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;cursor:pointer;z-index:5;opacity:0;transition:all .15s;border:none}
+.fav-btn:hover{background:#66c0f4;transform:scale(1.15)}
+.fav-btn.favorited{opacity:1;color:#f44}
+.game-card:hover .fav-btn{opacity:.75}
 
-        /* Game Grid */
-        .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:1rem}
-        .game-card{background:#16202d;border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
-        .game-card:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,.5)}
-        .game-card.hidden{display:none}
-        .fav-btn{position:absolute;top:.5rem;right:.5rem;width:28px;height:28px;background:rgba(0,0,0,.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;cursor:pointer;z-index:10;opacity:0;transition:all .2s}
-        .fav-btn:hover{background:#66c0f4;transform:scale(1.1)}
-        .fav-btn.favorited{opacity:1;color:#f00}
-        .game-card:hover .fav-btn{opacity:.8}
-        .game-card img{width:100%;height:87px;object-fit:cover;display:block}
-        .game-info{padding:.75rem}
-        .game-info h4{font-size:.875rem;color:#fff;font-weight:400;margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .game-meta{font-size:.75rem;color:#8f98a0}
-        .game-meta strong{color:#66c0f4}
-        .playtime{display:inline-block;background:#1b2838;padding:.2rem .5rem;border-radius:2px;margin-top:.25rem}
+/* Empty */
+.empty-state{text-align:center;padding:3rem 1rem;color:#8f98a0;display:none}
+.empty-state h3{font-size:1.1rem;color:#fff;margin-bottom:.5rem}
+.btn-primary{display:inline-block;padding:.6rem 1.5rem;background:#5c7e10;color:#d2e885;font-weight:700;text-decoration:none;border-radius:2px;font-size:.85rem;margin-top:.75rem}
+.btn-primary:hover{background:#6d9314}
 
-        /* Empty State */
-        .empty-state{text-align:center;padding:4rem 2rem;color:#8f98a0}
-        .empty-state h3{font-size:1.25rem;color:#fff;margin-bottom:1rem}
-        .empty-state p{margin-bottom:1.5rem}
-        .btn-primary{display:inline-block;padding:.75rem 2rem;background:#5c7e10;color:#d2e885;font-weight:700;text-decoration:none;border-radius:2px;font-size:.9rem}
-        .btn-primary:hover{background:#6d9314}
+/* Alert */
+.alert{padding:.6rem 1rem;border-radius:2px;margin-bottom:1rem;font-size:.85rem}
+.alert-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007}
 
-        /* Stats */
-        .stats{display:flex;gap:1rem;margin-bottom:2rem}
-        .stat-card{flex:1;background:#16202d;padding:1rem;border-radius:4px;border:1px solid #000}
-        .stat-card .label{font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem}
-        .stat-card .value{font-size:1.75rem;color:#66c0f4;font-weight:300}
+footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.2rem;color:#8f98a0;font-size:.75rem;margin-top:auto}
 
-        footer{background:#171a21;border-top:1px solid #000;padding:1.5rem;text-align:center;color:#8f98a0;font-size:.8rem}
-
-        @media(max-width:768px){
-            .sidebar{display:none}
-            .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
-        }
-    </style>
+@media(max-width:768px){
+    .sidebar{display:none}
+    .main-content{padding:1rem}
+    .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+}
+</style>
 </head>
 <body>
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" th:text="#{nav.store}">Store</a>
-        <a href="/dashboard" class="active" th:text="#{nav.library}">Library</a>
-        <div class="nav-right">
-            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span></a>
-            <span style="color:#8f98a0;font-size:.85rem" th:text="${user.username}"></span>
-            <form th:action="@{/logout}" method="post" style="display:inline">
-                <button type="submit" class="btn-logout" th:text="#{nav.signout}">Sign Out</button>
+
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.65rem 0;position:sticky;top:0;z-index:100">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
+        <a href="/" style="font-size:1.4rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#66c0f4;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px;background:rgba(103,193,245,.12)">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px">Profile</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.7rem">
+            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.85rem">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.8rem" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" style="padding:.35rem .8rem;background:#5c7e10;color:#d2e885;font-size:.8rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
             </form>
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.35rem .8rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.8rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none">Sign In</a>
+            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.25rem .4rem;border-radius:2px;font-size:.75rem;cursor:pointer">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
                 <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
@@ -115,65 +100,24 @@
 </nav>
 
 <div class="container">
-    <!-- Sidebar -->
+    <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar">
-        <h3>Library Home</h3>
-        <ul>
-            <li><a href="#" onclick="filterBy('all'); return false;" class="filter-item active" data-filter="all">
-                <span>All Games</span>
-                <span class="count" th:text="${gameCount}">0</span>
-            </a></li>
-            <li><a href="#" onclick="filterBy('recent'); return false;" class="filter-item" data-filter="recent">
-                <span>Recent</span>
-            </a></li>
-            <li><a href="#" onclick="filterBy('favorites'); return false;" class="filter-item" data-filter="favorites">
-                <span>Favorites</span>
-            </a></li>
+        <h3>Library</h3>
+        <ul id="sidebarLinks">
+            <li><a href="#" data-filter="all" class="active">All Games <span class="badge" th:text="${gameCount}">0</span></a></li>
+            <li><a href="#" data-filter="favorites">Favorites <span class="badge" id="favBadge">0</span></a></li>
         </ul>
-
         <h3>Collections</h3>
-        <ul>
-            <li><a href="#" onclick="filterByTag('Action'); return false;" class="filter-item" data-filter="action">
-                <span>Action</span>
-            </a></li>
-            <li><a href="#" onclick="filterByTag('RPG'); return false;" class="filter-item" data-filter="rpg">
-                <span>RPG</span>
-            </a></li>
-            <li><a href="#" onclick="filterByTag('Adventure'); return false;" class="filter-item" data-filter="adventure">
-                <span>Adventure</span>
-            </a></li>
-            <li><a href="#" onclick="filterByTag('Strategy'); return false;" class="filter-item" data-filter="strategy">
-                <span>Strategy</span>
-            </a></li>
-        </ul>
-
-        <h3>Filters</h3>
-        <ul>
-            <li><a href="#" onclick="alert('Install feature coming soon!'); return false;" class="filter-item">
-                <span>Installed</span>
-            </a></li>
-            <li><a href="#" onclick="alert('Install feature coming soon!'); return false;" class="filter-item">
-                <span>Not Installed</span>
-            </a></li>
-            <li><a href="#" onclick="alert('Updates feature coming soon!'); return false;" class="filter-item">
-                <span>Updates</span>
-            </a></li>
+        <ul id="collectionLinks">
+            <li th:each="tag : ${allTags}">
+                <a href="#" th:attr="data-tag=${tag}"><span th:text="${tag}"></span></a>
+            </li>
         </ul>
     </aside>
 
-    <!-- Main Content -->
+    <!-- ========== MAIN CONTENT ========== -->
     <main class="main-content">
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-
-        <!-- Header -->
-        <div class="page-header">
-            <h1>Your Library</h1>
-            <div class="view-options">
-                <button class="view-btn active" title="Grid View">⊞</button>
-                <button class="view-btn" title="List View">☰</button>
-            </div>
-        </div>
 
         <!-- Stats -->
         <div class="stats">
@@ -182,205 +126,157 @@
                 <div class="value" th:text="${gameCount}">0</div>
             </div>
             <div class="stat-card">
-                <div class="label">Total Value</div>
-                <div class="value" style="font-size:1.25rem">Coming Soon</div>
+                <div class="label">Total Spent</div>
+                <div class="value" th:text="${cSym} + ${#numbers.formatDecimal(totalSpent * cRate, 1, cDec)}"></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Favorites</div>
+                <div class="value" id="favCount">0</div>
             </div>
         </div>
 
         <!-- Search -->
         <div class="search-bar">
-            <input type="text" placeholder="Search your library..." id="searchInput" onkeyup="filterGames()">
+            <input type="text" placeholder="Search your library..." id="searchInput" oninput="doSearch()">
         </div>
 
-        <!-- Games Grid -->
-        <div th:if="${purchasedGames.isEmpty()}" class="empty-state">
+        <!-- Empty state -->
+        <div th:if="${purchasedGames.isEmpty()}" class="empty-state" style="display:block">
             <h3>Your library is empty</h3>
             <p>Start building your collection by browsing the store</p>
             <a href="/store" class="btn-primary">Browse Store</a>
         </div>
 
-        <div id="emptyFiltered" class="empty-state" style="display:none">
+        <!-- No results -->
+        <div id="noResults" class="empty-state">
             <h3>No games found</h3>
             <p>Try a different filter or search term.</p>
         </div>
 
+        <!-- Game Grid -->
         <div th:if="${!purchasedGames.isEmpty()}" class="games-grid" id="gamesGrid">
-            <div class="game-card"
-                 th:each="product : ${purchasedGames}"
-                 th:data-name="${product.name.toLowerCase()}"
-                 th:data-tags="${product.tags != null ? product.tags.toLowerCase() : ''}"
-                 th:data-id="${product.id}">
-                <div class="fav-btn" th:data-id="${product.id}" onclick="toggleFav(this)" title="Favorite">♡</div>
-                <img th:src="${product.headerImageUrl}"
-                     th:alt="${product.name}"
+            <a class="game-card"
+               th:each="product : ${purchasedGames}"
+               th:href="@{/store/game/{id}(id=${product.id})}"
+               th:attr="data-name=${#strings.toLowerCase(product.name)},data-tags=${product.tags != null ? #strings.toLowerCase(product.tags) : ''},data-id=${product.id}">
+                <button class="fav-btn"
+                        th:data-id="${product.id}"
+                        th:classappend="${favoriteIds.contains(product.id) ? 'favorited' : ''}"
+                        th:text="${favoriteIds.contains(product.id) ? '♥' : '♡'}"
+                        onclick="toggleFav(this,event)" title="Favorite"></button>
+                <img th:src="${product.headerImageUrl}" th:alt="${product.name}"
                      onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
                 <div class="game-info">
-                    <h4 th:text="${product.name}">Game Name</h4>
-                    <div class="game-meta">
-                        <span class="playtime" th:each="tag,i : ${#strings.arraySplit(product.tags != null ? product.tags : '', ',')}"
-                              th:if="${i.index == 0}" th:text="${#strings.trim(tag)}">Tag</span>
-                    </div>
+                    <h4 th:text="${product.name}"></h4>
+                    <div class="game-meta" th:text="${product.developer}"></div>
                 </div>
-            </div>
+            </a>
         </div>
     </main>
 </div>
 
-<footer>
-    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
-</footer>
+<footer>&copy; 2026 Steam Store · Not affiliated with Valve Corporation</footer>
 
 <script>
-// Store favorites in localStorage
-let favorites = JSON.parse(localStorage.getItem('steamFavorites') || '[]');
+// Current filter: 'all', 'favorites', or tag string
+var currentFilter = 'all';
 
-// Apply favorites on page load
-document.addEventListener('DOMContentLoaded', function() {
-    favorites.forEach(id => {
-        const btn = document.getElementById('fav-' + id);
-        if (btn) {
-            btn.classList.add('favorited');
-            btn.textContent = '♥';
-        }
+// ===== FAVORITE TOGGLE =====
+function toggleFav(btn, evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    var id = btn.getAttribute('data-id');
+    fetch('/dashboard/favorite', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'productId=' + id
+    }).then(function(r){return r.json()}).then(function(d){
+        if (d.added) { btn.classList.add('favorited'); btn.textContent = '♥'; }
+        else { btn.classList.remove('favorited'); btn.textContent = '♡'; }
+        updateFavCount(d.count);
+        if (currentFilter === 'favorites') applyFilter();
     });
+}
 
-    // Set active state on All Games by default
-    document.querySelector('[data-filter="all"]').classList.add('active');
-});
+function updateFavCount(n) {
+    document.getElementById('favCount').textContent = n;
+    var b = document.getElementById('favBadge');
+    if (b) b.textContent = n;
+}
 
-// Toggle favorite
-function toggleFav(id, btn) {
-    event.stopPropagation();
-    const idx = favorites.indexOf(id);
-    if (idx > -1) {
-        favorites.splice(idx, 1);
-        btn.classList.remove('favorited');
-        btn.textContent = '♥';
+// ===== FILTER =====
+function setActive(el) {
+    document.querySelectorAll('.sidebar a').forEach(function(a){ a.classList.remove('active'); });
+    el.classList.add('active');
+}
+
+function doFilter(el) {
+    setActive(el);
+    var filter = el.getAttribute('data-filter');
+    var tag = el.getAttribute('data-tag');
+    if (filter) { currentFilter = filter; }
+    else if (tag) { currentFilter = tag; }
+    applyFilter();
+}
+
+function applyFilter() {
+    var cards = document.querySelectorAll('#gamesGrid .game-card');
+    var f = currentFilter;
+    var visible = 0;
+
+    if (f === 'all') {
+        for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('hidden'); }
+        visible = cards.length;
+    } else if (f === 'favorites') {
+        for (var i = 0; i < cards.length; i++) {
+            var b = cards[i].querySelector('.fav-btn');
+            if (b && b.classList.contains('favorited')) { cards[i].classList.remove('hidden'); visible++; }
+            else { cards[i].classList.add('hidden'); }
+        }
     } else {
-        favorites.push(id);
-        btn.classList.add('favorited');
-        btn.textContent = '♥';
-    }
-    localStorage.setItem('steamFavorites', JSON.stringify(favorites));
-}
-
-// Search filter
-function filterGames() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const grid = document.getElementById('gamesGrid');
-    const cards = grid.getElementsByClassName('game-card');
-    let visibleCount = 0;
-
-    for (let i = 0; i < cards.length; i++) {
-        const name = cards[i].getAttribute('data-name');
-        if (name.indexOf(filter) > -1) {
-            cards[i].classList.remove('hidden');
-            visibleCount++;
-        } else {
-            cards[i].classList.add('hidden');
+        // Tag filter
+        var searchTag = f.toLowerCase();
+        for (var i = 0; i < cards.length; i++) {
+            var tags = cards[i].getAttribute('data-tags') || '';
+            if (tags.indexOf(searchTag) > -1) { cards[i].classList.remove('hidden'); visible++; }
+            else { cards[i].classList.add('hidden'); }
         }
     }
-
-    toggleEmptyState(visibleCount);
+    // Also re-apply search if any
+    var searchVal = (document.getElementById('searchInput').value || '').trim();
+    if (searchVal) doSearch();
+    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
 }
 
-// Filter by category (Library Home)
-function filterBy(type) {
-    const grid = document.getElementById('gamesGrid');
-    const cards = grid.getElementsByClassName('game-card');
-    let visibleCount = 0;
-
-    // Clear search
-    document.getElementById('searchInput').value = '';
-
-    // Update active state
-    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    document.querySelector('[data-filter="' + type + '"]').classList.add('active');
-
-    for (let i = 0; i < cards.length; i++) {
-        const id = parseInt(cards[i].getAttribute('data-id'));
-
-        if (type === 'all') {
-            cards[i].classList.remove('hidden');
-            visibleCount++;
-        } else if (type === 'favorites') {
-            if (favorites.includes(id)) {
-                cards[i].classList.remove('hidden');
-                visibleCount++;
-            } else {
-                cards[i].classList.add('hidden');
-            }
-        } else if (type === 'recent') {
-            // Show last 10 games (simple implementation)
-            if (i < 10) {
-                cards[i].classList.remove('hidden');
-                visibleCount++;
-            } else {
-                cards[i].classList.add('hidden');
-            }
-        }
+// ===== SEARCH =====
+function doSearch() {
+    var val = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    var cards = document.querySelectorAll('#gamesGrid .game-card');
+    var visible = 0;
+    for (var i = 0; i < cards.length; i++) {
+        if (cards[i].classList.contains('hidden')) continue; // already hidden by filter
+        var name = cards[i].getAttribute('data-name') || '';
+        if (!val || name.indexOf(val) > -1) { cards[i].classList.remove('hidden'); visible++; }
+        else { cards[i].classList.add('hidden'); }
     }
-
-    toggleEmptyState(visibleCount);
+    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
 }
 
-// Filter by tag (Collections)
-function filterByTag(tag) {
-    const grid = document.getElementById('gamesGrid');
-    const cards = grid.getElementsByClassName('game-card');
-    const searchTag = tag.toLowerCase();
-    let visibleCount = 0;
-
-    // Clear search
-    document.getElementById('searchInput').value = '';
-
-    // Update active state
-    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    event.target.closest('a').classList.add('active');
-
-    for (let i = 0; i < cards.length; i++) {
-        const tags = cards[i].getAttribute('data-tags');
-        if (tags && tags.indexOf(searchTag) > -1) {
-            cards[i].classList.remove('hidden');
-            visibleCount++;
-        } else {
-            cards[i].classList.add('hidden');
-        }
+// ===== INIT =====
+(function(){
+    // Attach click handlers to all sidebar links
+    var links = document.querySelectorAll('.sidebar a[data-filter], .sidebar a[data-tag]');
+    for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener('click', function(e){
+            e.preventDefault();
+            doFilter(this);
+        });
     }
-
-    toggleEmptyState(visibleCount);
-}
-
-// Toggle empty state
-function toggleEmptyState(visibleCount) {
-    const emptyFiltered = document.getElementById('emptyFiltered');
-    const emptyInitial = document.querySelector('.empty-state:not(#emptyFiltered)');
-
-    if (emptyFiltered) {
-        if (visibleCount === 0 && !emptyInitial) {
-            emptyFiltered.style.display = 'block';
-        } else {
-            emptyFiltered.style.display = 'none';
-        }
-    }
-}
-
-// View toggle (Grid/List)
-document.querySelectorAll('.view-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-
-        const grid = document.getElementById('gamesGrid');
-        if (this.title === 'List View') {
-            grid.style.gridTemplateColumns = '1fr';
-            alert('List view coming soon!');
-        } else {
-            grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(184px,1fr))';
-        }
-    });
-});
+    // Init fav counts
+    var favBtns = document.querySelectorAll('#gamesGrid .fav-btn.favorited');
+    updateFavCount(favBtns.length);
+})();
 </script>
+
 </body>
 </html>

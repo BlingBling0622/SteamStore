@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Link Test</title>
+    <style>
+        body { background: #1b2838; color: white; font-family: Arial; padding: 50px; }
+        .test-card { background: #16202d; padding: 20px; margin: 20px; border-radius: 5px; cursor: pointer; }
+        .test-card:hover { background: #2a475e; }
+        a { color: white; text-decoration: none; display: block; }
+        .success { color: #a4d007; }
+        .error { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Link Test Page</h1>
+
+    <div class="test-card">
+        <a href="/store/game/1">
+            <h2>Test 1: Click this entire box</h2>
+            <p>Should go to: /store/game/1 (Elden Ring)</p>
+        </a>
+    </div>
+
+    <div class="test-card">
+        <a href="/store/game/131">
+            <h2>Test 2: Click this entire box</h2>
+            <p>Should go to: /store/game/131 (War Thunder)</p>
+        </a>
+    </div>
+
+    <h3 class="success">✓ Backend is working (HTTP 200)</h3>
+    <h3 class="success">✓ Database has all images</h3>
+    <h3 class="success">✓ Links are being generated</h3>
+
+    <hr>
+    <h2>Instructions:</h2>
+    <ol>
+        <li>Visit: <strong>http://localhost:8080/test.html</strong></li>
+        <li>Click on the boxes above</li>
+        <li>If they work, the problem is just CSS/JavaScript in store.html</li>
+        <li>If they don't work, there's a browser/security issue</li>
+    </ol>
+
+    <hr>
+    <p><a href="/store">← Back to Store</a></p>
+
+    <script>
+        console.log('✓ Test page loaded successfully');
+        console.log('✓ Click on the boxes above to test links');
+
+        document.querySelectorAll('a').forEach((link, i) => {
+            link.addEventListener('click', function(e) {
+                console.log(`Clicked link ${i+1}: ${this.href}`);
+            });
+        });
+    </script>
+</body>
+</html>

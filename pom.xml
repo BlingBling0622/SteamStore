@@ -89,6 +89,13 @@
             <artifactId>gson</artifactId>
         </dependency>
 
+        <!-- OpenID4Java -->
+        <dependency>
+            <groupId>org.openid4java</groupId>
+            <artifactId>openid4java</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot DevTools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

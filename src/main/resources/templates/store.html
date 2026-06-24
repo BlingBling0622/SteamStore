@@ -81,16 +81,20 @@
     </style>
 </head>
 <body>
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" class="active" th:text="#{nav.store}">Store</a>
-        <div class="nav-right">
-            <a href="/dashboard" class="btn-lib" th:text="#{nav.library}">Library</a>
-            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span>
-                <span th:if="${cartCount != null and cartCount > 0}" th:text="'(' + ${cartCount} + ')'"></span>
-            </a>
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
+        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
+            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none">Sign In</a>
+            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
                 <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
@@ -117,11 +121,11 @@
     <div class="filter-bar">
         <div class="filter-section">
             <span class="filter-label">Filter:</span>
-            <button class="filter-btn active" onclick="filterGames('all')">All</button>
-            <button class="filter-btn" onclick="filterGames('action')">Action</button>
-            <button class="filter-btn" onclick="filterGames('rpg')">RPG</button>
-            <button class="filter-btn" onclick="filterGames('strategy')">Strategy</button>
-            <button class="filter-btn" onclick="filterGames('indie')">Indie</button>
+            <button class="filter-btn active" onclick="filterGames('all', event)">All</button>
+            <button class="filter-btn" onclick="filterGames('action', event)">Action</button>
+            <button class="filter-btn" onclick="filterGames('rpg', event)">RPG</button>
+            <button class="filter-btn" onclick="filterGames('strategy', event)">Strategy</button>
+            <button class="filter-btn" onclick="filterGames('indie', event)">Indie</button>
         </div>
 
         <div class="search-box">
@@ -129,8 +133,8 @@
         </div>
 
         <div class="view-toggle">
-            <button class="active" onclick="switchView('grid')" title="Grid View">⊞</button>
-            <button onclick="switchView('list')" title="List View">☰</button>
+            <button class="active" onclick="switchView('grid', event)" title="Grid View">⊞</button>
+            <button onclick="switchView('list', event)" title="List View">☰</button>
         </div>
     </div>
 
@@ -140,6 +144,7 @@
            th:href="@{/store/game/{id}(id=${p.id})}"
            class="game-card"
            th:attr="data-tags=${p.tags != null ? #strings.toLowerCase(p.tags) : ''}, data-name=${#strings.toLowerCase(p.name)}">
+            <div th:if="${ownedIds != null and ownedIds.contains(p.id)}" class="owned-badge" style="z-index:5">In Library</div>
             <img th:src="${p.headerImageUrl}" th:alt="${p.name}" class="game-card-image"
                  onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
             <div class="game-card-body">
@@ -171,7 +176,8 @@
            th:href="@{/store/game/{id}(id=${p.id})}"
            class="game-row"
            th:attr="data-tags=${p.tags != null ? #strings.toLowerCase(p.tags) : ''}, data-name=${#strings.toLowerCase(p.name)}">
-            <img th:src="${p.headerImageUrl}" th:alt="${p.name}" class="game-row-image"
+            <div th:if="${ownedIds != null and ownedIds.contains(p.id)}" class="owned-badge" style="position:absolute;top:.3rem;left:.3rem;z-index:5">In Library</div>
+            <img th:src="${p.capsuleImageUrl != null ? p.capsuleImageUrl : p.headerImageUrl}" th:alt="${p.name}" class="game-row-image"
                  onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
             <div class="game-row-info">
                 <span class="game-row-name" th:text="${p.name}">Game Name</span>
@@ -209,12 +215,12 @@ function searchGames() {
     });
 }
 
-function filterGames(genre) {
+function filterGames(genre, evt) {
     const cards = document.querySelectorAll('.game-card, .game-row');
     const buttons = document.querySelectorAll('.filter-btn');
 
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    evt.target.classList.add('active');
 
     if (genre === 'all') {
         cards.forEach(card => card.style.display = '');
@@ -227,13 +233,13 @@ function filterGames(genre) {
     });
 }
 
-function switchView(view) {
+function switchView(view, evt) {
     const grid = document.getElementById('gameGrid');
     const list = document.getElementById('gameList');
     const buttons = document.querySelectorAll('.view-toggle button');
 
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    evt.target.classList.add('active');
 
     if (view === 'grid') {
         grid.style.display = 'grid';

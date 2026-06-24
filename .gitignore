@@ -37,3 +37,6 @@ Thumbs.db
 
 ### Logs ###
 *.log
+data/
+steam-media-cache.json
+uploads/

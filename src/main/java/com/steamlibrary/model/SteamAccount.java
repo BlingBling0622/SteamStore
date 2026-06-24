@@ -8,39 +8,37 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "users")
+@Table(name = "steam_accounts", indexes = {
+    @Index(name = "idx_steam_id", columnList = "steamId"),
+    @Index(name = "idx_user_id", columnList = "user_id")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class SteamAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    private User user;
 
     @Column(unique = true, nullable = false)
-    private String email;
-
-    @Column(name = "steam_id", unique = true)
     private String steamId;
 
-    @Column(name = "profile_background_url", length = 2000)
-    private String profileBackgroundUrl;
+    @Column
+    private String personaName;
 
-    @Column(name = "nickname", length = 100)
-    private String nickname;
+    @Column
+    private String profileUrl;
 
-    @Column(name = "avatar_url", length = 2000)
+    @Column
     private String avatarUrl;
 
-    @Column(name = "favorite_ids", length = 2000)
-    private String favoriteIds;
+    @Column(name = "last_synced")
+    private LocalDateTime lastSynced;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -62,9 +60,9 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return id != null && id.equals(user.getId());
+        if (!(o instanceof SteamAccount)) return false;
+        SteamAccount that = (SteamAccount) o;
+        return id != null && id.equals(that.getId());
     }
 
     @Override

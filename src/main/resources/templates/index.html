@@ -1,81 +1,92 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Store</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df}
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
-        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
-        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
-        .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
-        .nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
-        .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-        .btn-nav{padding:.4rem 1rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase}
-        .btn-nav:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
-        .btn-login{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none}
-        .btn-login:hover{background:linear-gradient(to bottom,#316282,#234e6b)}
-        .cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
-        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
-        .lang-select:focus{outline:none;border-color:#66c0f4}
-        .hero{background:linear-gradient(to bottom,#2a475e,#1b2838);border-bottom:1px solid #2a475e}
-        .hero-inner{max-width:1200px;margin:0 auto;padding:2rem 20px}
-        .section-label{font-size:.85rem;color:#8f98a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
-        .section-label a{color:#66c0f4;text-decoration:none;font-size:.8rem}
-        .featured-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem}
-        .featured-main{position:relative;border-radius:3px;overflow:hidden;cursor:pointer;text-decoration:none;display:block}
-        .featured-main img{width:100%;height:280px;object-fit:cover;display:block}
-        .featured-main-info{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(transparent,rgba(0,0,0,.85))}
-        .featured-main-info h3{font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:.5rem}
-        .tags{display:flex;gap:.4rem;flex-wrap:wrap}
-        .tag{background:rgba(103,193,245,.15);color:#66c0f4;padding:.2rem .6rem;border-radius:2px;font-size:.75rem}
-        .featured-side{display:flex;flex-direction:column;gap:.5rem}
-        .side-item{display:flex;gap:.75rem;align-items:center;background:#16202d;border:1px solid #2a475e;border-radius:3px;padding:.75rem;text-decoration:none;color:inherit;transition:background .15s}
-        .side-item:hover{background:#2a475e}
-        .side-item img{width:100px;height:56px;object-fit:cover;border-radius:2px;flex-shrink:0}
-        .side-item-info{flex:1;min-width:0}
-        .side-item-info h4{font-size:.9rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.25rem}
-        .side-price{font-size:.85rem;font-weight:700;color:#acdbf5;white-space:nowrap}
-        .badge-discount{background:#4c6b22;color:#a4d007;padding:.1rem .4rem;border-radius:2px;font-size:.75rem;font-weight:700}
-        .section{max-width:1200px;margin:2rem auto;padding:0 20px}
-        .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
-        .game-card{background:#16202d;border:1px solid #2a475e;border-radius:3px;overflow:hidden;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:block}
-        .game-card:hover{border-color:#66c0f4;transform:translateY(-2px)}
-        .game-card img{width:100%;height:90px;object-fit:cover;display:block}
-        .game-card-body{padding:.6rem}
-        .game-card-body h4{font-size:.85rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.4rem}
-        .price-row{display:flex;align-items:center;gap:.4rem}
-        .price-old{text-decoration:line-through;color:#8f98a0;font-size:.75rem}
-        .price-new{color:#acdbf5;font-size:.85rem;font-weight:700}
-        .price-free{color:#a4d007;font-size:.85rem;font-weight:700}
-        footer{background:#171d25;border-top:1px solid #2a475e;padding:2rem 20px;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:3rem}
-        @media(max-width:768px){.featured-grid{grid-template-columns:1fr}.game-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steam Store</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df}
+nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
+.logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
+.logo span{color:#66c0f4}
+.nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
+.nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.btn-nav{padding:.4rem 1rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase}
+.btn-nav:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
+.btn-login{padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none}
+.btn-login:hover{background:linear-gradient(to bottom,#316282,#234e6b)}
+.cart-btn{color:#66c0f4;text-decoration:none;font-size:.9rem}
+.lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
+.lang-select:focus{outline:none;border-color:#66c0f4}
+
+/* Hero / Carousel */
+.hero{background:linear-gradient(to bottom,#2a475e,#1b2838);border-bottom:1px solid #2a475e}
+.hero-inner{max-width:1200px;margin:0 auto;padding:2rem 20px}
+.section-label{font-size:.85rem;color:#8f98a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+
+.carousel-wrapper{position:relative;display:flex;align-items:center;justify-content:center;height:300px;overflow:hidden;perspective:1000px}
+.carousel-slide{position:absolute;width:70%;height:100%;border-radius:6px;overflow:hidden;text-decoration:none;transition:all .55s cubic-bezier(.23,1,.32,1);cursor:pointer}
+.carousel-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.carousel-slide .slide-info{position:absolute;bottom:0;left:0;right:0;padding:.8rem 1rem;background:linear-gradient(transparent,rgba(0,0,0,.9));transition:opacity .35s}
+.carousel-slide .slide-info h3{font-size:1.1rem;color:#fff;font-weight:700;margin-bottom:.2rem}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.tag{background:rgba(103,193,245,.15);color:#66c0f4;padding:.2rem .6rem;border-radius:2px;font-size:.75rem}
+
+/* Slide positions */
+.carousel-slide.prev{transform:translateX(-44%) scale(.8);opacity:.4;z-index:1;filter:brightness(.55)}
+.carousel-slide.active{transform:translateX(0) scale(1);opacity:1;z-index:3;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.carousel-slide.next{transform:translateX(44%) scale(.8);opacity:.4;z-index:1;filter:brightness(.55)}
+.carousel-slide.hidden{transform:translateX(0) scale(.7);opacity:0;z-index:0;pointer-events:none}
+
+.carousel-slide.prev .slide-info,.carousel-slide.next .slide-info{opacity:0}
+
+/* Arrows */
+.carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;background:rgba(0,0,0,.5);border:none;color:#fff;font-size:1.4rem;cursor:pointer;z-index:10;border-radius:50%;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.carousel-arrow:hover{background:rgba(103,193,245,.6);transform:translateY(-50%) scale(1.1)}
+.carousel-prev{left:0}
+.carousel-next{right:0}
+
+/* Dots */
+.carousel-dots{display:flex;justify-content:center;gap:.5rem;margin-top:1rem}
+.carousel-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:all .25s}
+.carousel-dot.active{background:#66c0f4;transform:scale(1.35)}
+
+/* Game Grid */
+.section{max-width:1200px;margin:2rem auto;padding:0 20px}
+.section-label a{color:#66c0f4;text-decoration:none;font-size:.8rem}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+.game-card{background:#16202d;border:1px solid #2a475e;border-radius:3px;overflow:hidden;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:block}
+.game-card:hover{border-color:#66c0f4;transform:translateY(-2px)}
+.game-card img{width:100%;height:90px;object-fit:cover;display:block}
+.game-card-body{padding:.6rem}
+.game-card-body h4{font-size:.85rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.4rem}
+.price-row{display:flex;align-items:center;gap:.4rem}
+.price-old{text-decoration:line-through;color:#8f98a0;font-size:.75rem}
+.price-new{color:#acdbf5;font-size:.85rem;font-weight:700}
+.price-free{color:#a4d007;font-size:.85rem;font-weight:700}
+.badge-discount{background:#4c6b22;color:#a4d007;padding:.1rem .4rem;border-radius:2px;font-size:.75rem;font-weight:700}
+footer{background:#171d25;border-top:1px solid #2a475e;padding:2rem 20px;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:3rem}
+@media(max-width:768px){.carousel-wrapper{height:200px}.carousel-slide{width:90%}.carousel-slide.prev{transform:translateX(-52%) scale(.85)}.carousel-slide.next{transform:translateX(52%) scale(.85)}.game-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+</style>
 </head>
 <body>
-<nav>
+
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
     <div class="nav-inner">
         <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" th:text="#{nav.store}">Store</a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
         <div class="nav-right">
-            <a href="/dashboard" class="btn-login" th:text="#{nav.library}">Library</a>
-            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span>
-                <span sec:authorize="isAuthenticated()" th:if="${cartCount != null and cartCount > 0}" th:text="'(' + ${cartCount} + ')'"></span>
-            </a>
-            <div sec:authorize="isAuthenticated()">
-                <span style="color:#8f98a0;font-size:.85rem;margin-right:.5rem" sec:authentication="name"></span>
-                <form th:action="@{/logout}" method="post" style="display:inline">
-                    <button type="submit" class="btn-login" style="background:none;border:none;color:#66c0f4;cursor:pointer;padding:.4rem 1rem" th:text="#{nav.signout}">Sign Out</button>
-                </form>
-            </div>
-            <div sec:authorize="!isAuthenticated()">
-                <a href="/login" class="btn-login" th:text="#{nav.signin}">Sign In</a>
-                <a href="/register" class="btn-nav" th:text="#{nav.joinfree}">Join Free</a>
-            </div>
+            <a href="/cart" class="cart-btn">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" class="btn-nav" style="text-transform:none;font-size:.8rem;padding:.35rem .8rem">Sign Out</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" href="/login" class="btn-login">Sign In</a>
             <select class="lang-select" onchange="window.location.href='?lang='+this.value">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
@@ -92,35 +103,12 @@
 
 <div class="hero">
     <div class="hero-inner">
-        <div class="section-label"><span th:text="#{store.featured}">Featured</span></div>
-        <div class="featured-grid" th:if="${!featured.isEmpty()}">
-            <a th:href="@{/store/game/{id}(id=${featured[0].id})}" class="featured-main">
-                <img th:src="${featured[0].headerImageUrl}" th:alt="${featured[0].name}">
-                <div class="featured-main-info">
-                    <h3 th:text="${featured[0].name}"></h3>
-                    <div class="tags">
-                        <span class="tag" th:each="tag : ${#strings.arraySplit(featured[0].tags, ',')}" th:text="${#strings.trim(tag)}"></span>
-                    </div>
-                </div>
-            </a>
-            <div class="featured-side">
-                <a th:each="p,i : ${featured}" th:if="${i.index > 0 and i.index <= 4}"
-                   th:href="@{/store/game/{id}(id=${p.id})}" class="side-item">
-                    <img th:src="${p.headerImageUrl}" th:alt="${p.name}">
-                    <div class="side-item-info">
-                        <h4 th:text="${p.name}"></h4>
-                        <div class="price-row">
-                            <span class="badge-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
-                            <span class="price-free" th:if="${p.price == 0}" th:text="#{store.free}">Free</span>
-                            <span class="price-new" th:if="${p.price > 0 and p.discountPercent > 0}"
-                                  th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
-                            <span class="price-new" th:if="${p.price > 0 and p.discountPercent == 0}"
-                                  th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
-                        </div>
-                    </div>
-                </a>
-            </div>
+        <div class="section-label"><span>Featured &amp; Recommended</span><span id="carouselCounter"></span></div>
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <button class="carousel-arrow carousel-prev" onclick="changeSlide(-1);event.stopPropagation()">&#10094;</button>
+            <button class="carousel-arrow carousel-next" onclick="changeSlide(1);event.stopPropagation()">&#10095;</button>
         </div>
+        <div class="carousel-dots" id="carouselDots"></div>
     </div>
 </div>
 
@@ -136,12 +124,11 @@
                 <h4 th:text="${p.name}"></h4>
                 <div class="price-row">
                     <span class="badge-discount" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
-                    <span class="price-old"  th:if="${p.discountPercent > 0}"
-                          th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
+                    <span class="price-old" th:if="${p.discountPercent > 0}" th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
                     <span class="price-free" th:if="${p.price == 0}" th:text="#{store.free}">Free</span>
-                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent > 0}"
+                    <span class="price-new" th:if="${p.price > 0 and p.discountPercent > 0}"
                           th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
-                    <span class="price-new"  th:if="${p.price > 0 and p.discountPercent == 0}"
+                    <span class="price-new" th:if="${p.price > 0 and p.discountPercent == 0}"
                           th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
                 </div>
             </div>
@@ -149,8 +136,83 @@
     </div>
 </div>
 
-<footer>
-    <span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span>
-</footer>
+<div id="allGamesData" style="display:none">
+    <span class="gd-item" th:each="p : ${allProducts}" th:attr="data-id=${p.id},data-name=${p.name},data-img=${p.screenshot1Url != null ? p.screenshot1Url : p.headerImageUrl},data-tags=${p.tags}"></span>
+</div>
+
+<footer><span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span></footer>
+
+<script>
+var carouselGames = [];
+var carouselIdx = 0;
+var carouselTimer = null;
+var positions = ['prev','active','next'];
+
+(function initCarousel() {
+    var items = document.querySelectorAll('#allGamesData .gd-item');
+    var games = [];
+    for (var i = 0; i < items.length; i++) {
+        games.push({
+            id: parseInt(items[i].getAttribute('data-id')),
+            name: items[i].getAttribute('data-name'),
+            img: items[i].getAttribute('data-img'),
+            tags: items[i].getAttribute('data-tags') || ''
+        });
+    }
+    if (games.length < 4) return;
+    // Shuffle, pick 4
+    for (var i = games.length - 1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); var t=games[i];games[i]=games[j];games[j]=t; }
+    carouselGames = games.slice(0, 4);
+
+    // Build slides
+    var wrapper = document.getElementById('carouselWrapper');
+    for (var i = 0; i < carouselGames.length; i++) {
+        var g = carouselGames[i];
+        var tagsHtml = '';
+        if (g.tags) { var ta = g.tags.split(','); for (var t=0;t<ta.length;t++) tagsHtml += '<span class="tag">'+ta[t].trim()+'</span>'; }
+        var slide = document.createElement('a');
+        slide.className = 'carousel-slide hidden';
+        slide.href = '/store/game/' + g.id;
+        slide.setAttribute('data-index', i);
+        slide.innerHTML = '<img src="'+g.img+'" alt="'+g.name+'"><div class="slide-info"><h3>'+g.name+'</h3><div class="tags">'+tagsHtml+'</div></div>';
+        wrapper.insertBefore(slide, wrapper.firstChild);
+    }
+    // Build dots
+    var dotsHtml = '';
+    for (var d = 0; d < carouselGames.length; d++) dotsHtml += '<button class="carousel-dot'+ (d===0?' active':'') +'" onclick="showSlide('+d+')"></button>';
+    document.getElementById('carouselDots').innerHTML = dotsHtml;
+    document.getElementById('carouselCounter').textContent = '1 / 4';
+    showSlide(0);
+    startAutoPlay();
+})();
+
+function showSlide(idx) {
+    carouselIdx = idx;
+    var slides = document.querySelectorAll('.carousel-slide');
+    // Reset all
+    slides.forEach(function(s){ s.className = 'carousel-slide hidden'; });
+    // Set prev/active/next
+    var prev = (idx - 1 + carouselGames.length) % carouselGames.length;
+    var next = (idx + 1) % carouselGames.length;
+    slides[prev].className = 'carousel-slide prev';
+    slides[idx].className = 'carousel-slide active';
+    slides[next].className = 'carousel-slide next';
+    // Dots
+    document.querySelectorAll('.carousel-dot').forEach(function(d,i){ d.classList.toggle('active', i===idx); });
+    document.getElementById('carouselCounter').textContent = (idx+1) + ' / ' + carouselGames.length;
+}
+
+function changeSlide(dir) {
+    var idx = carouselIdx + dir;
+    if (idx < 0) idx = carouselGames.length - 1;
+    if (idx >= carouselGames.length) idx = 0;
+    showSlide(idx);
+    resetAutoPlay();
+}
+
+function startAutoPlay() { carouselTimer = setInterval(function(){ changeSlide(1); }, 4500); }
+function resetAutoPlay() { clearInterval(carouselTimer); startAutoPlay(); }
+</script>
+
 </body>
 </html>

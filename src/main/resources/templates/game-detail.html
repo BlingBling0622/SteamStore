@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${product.name} + ' on Steam'">Game on Steam</title>
+    <script src="/dash.all.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Motiva Sans','Arial',sans-serif;background:#1b2838;color:#c6d4df;min-height:100vh}
@@ -24,24 +25,18 @@
 
         /* Hero */
         .hero{background:linear-gradient(to bottom,rgba(0,0,0,0),#1b2838);padding:1.5rem 0 2rem}
-        .hero-inner{max-width:940px;margin:0 auto;padding:0 20px}
+        .hero-inner{max-width:1200px;margin:0 auto;padding:0 20px}
         .breadcrumbs{font-size:.85rem;color:#8f98a0;margin-bottom:1rem}
         .breadcrumbs a{color:#66c0f4;text-decoration:none}
         .game-title{font-size:2rem;color:#fff;font-weight:300;margin-bottom:1.5rem}
-        .hero-layout{display:grid;grid-template-columns:616px 1fr;gap:1.5rem}
+        .hero-layout{display:grid;grid-template-columns:820px 1fr;gap:2rem}
 
-        /* Media Section */
-        .main-media-container{width:100%;height:353px;background:#000;border-radius:4px 4px 0 0;position:relative;overflow:hidden}
-        .main-image,.main-video{width:100%;height:100%;object-fit:cover;display:block}
-        .main-video{display:none}
-        .media-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:1rem;display:flex;align-items:center;gap:.5rem}
-        .control-btn{width:32px;height:32px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;border-radius:2px;font-size:.9rem}
-        .control-btn:hover{background:rgba(255,255,255,.3)}
-        .media-counter{margin-left:auto;color:#8f98a0;font-size:.85rem}
-        .fullscreen-btn{position:absolute;top:1rem;right:1rem;width:36px;height:36px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.3);color:#fff;cursor:pointer;border-radius:2px;z-index:10}
-
-        .thumbnail-carousel{background:rgba(0,0,0,.6);padding:.5rem;border-radius:0 0 4px 4px;display:flex;gap:.5rem;overflow-x:auto}
-        .carousel-thumb{width:116px;height:65px;object-fit:cover;cursor:pointer;border:2px solid transparent;border-radius:2px;transition:all .2s}
+        /* Media Section - LARGER AND WIDER */
+        .main-media-container{max-width:100%;height:461px;background:#000;border-radius:4px 4px 0 0;position:relative;overflow:hidden}
+        .main-image,.main-video{width:100%;height:100%;object-fit:contain;display:block;background:#000;max-width:100%}
+        .main-video.hidden{display:none}
+        .thumbnail-carousel{background:rgba(0,0,0,.6);padding:.75rem;border-radius:0 0 4px 4px;display:flex;gap:.75rem;overflow-x:auto}
+        .carousel-thumb{width:150px;height:85px;object-fit:cover;cursor:pointer;border:2px solid transparent;border-radius:2px;transition:all .2s}
         .carousel-thumb:hover,.carousel-thumb.active{border-color:#66c0f4}
 
         /* Purchase Box */
@@ -67,7 +62,7 @@
         .btn-owned{padding:1rem;background:#1b2838;color:#a4d007;border:1px solid #4c6b22;border-radius:2px;text-align:center;font-weight:700}
 
         /* Content Area */
-        .content-area{max-width:940px;margin:2rem auto;padding:0 20px}
+        .content-area{max-width:1200px;margin:2rem auto;padding:0 20px}
         section{background:#16202d;border-radius:4px;padding:1.5rem;margin-bottom:2rem}
         section h2{font-size:1.25rem;color:#fff;font-weight:600;margin-bottom:1rem;text-transform:uppercase}
         .about-content{line-height:1.8;color:#c6d4df}
@@ -86,16 +81,20 @@
     </style>
 </head>
 <body>
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" th:text="#{nav.store}">Store</a>
-        <div class="nav-right">
-            <a href="/dashboard" class="btn-lib" th:text="#{nav.library}">Library</a>
-            <a href="/cart" class="cart-btn">🛒 <span th:text="#{nav.cart}">Cart</span>
-                <span th:if="${cartCount != null and cartCount > 0}" th:text="'(' + ${cartCount} + ')'"></span>
-            </a>
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
+        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
+            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none">Sign In</a>
+            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer">
                 <option value="en" th:selected="${currentLang == 'en'}">EN</option>
                 <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
                 <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
@@ -122,16 +121,9 @@
                 <div class="main-media-container">
                     <img th:src="${product.headerImageUrl}" class="main-image" id="mainImage" th:alt="${product.name}"
                          onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
-                    <video class="main-video" id="mainVideo" controls preload="metadata">
-                        <source th:if="${product.trailerVideoUrl != null}" th:src="${product.trailerVideoUrl}" type="video/webm">
-                    </video>
-                    <div class="media-overlay">
-                        <button class="control-btn" onclick="prevMedia()">◀</button>
-                        <button class="control-btn" id="playBtn" onclick="togglePlay()">▶</button>
-                        <button class="control-btn" onclick="nextMedia()">▶</button>
-                        <span class="media-counter" id="counter">1 / 1</span>
-                    </div>
-                    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+                    <video class="main-video hidden" id="mainVideo" controls preload="auto"
+                           playsinline th:poster="${product.screenshot1Url}"></video>
+                    <div class="main-video hidden" id="youtubePlayer"></div>
                 </div>
                 <div class="thumbnail-carousel" id="thumbs"></div>
             </div>
@@ -143,9 +135,9 @@
                      onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
                 <p class="short-desc" th:text="${product.description}">Game description</p>
 
-                <div th:if="${product.reviewSummary != null}" class="meta-row">
-                    <span class="label">Reviews:</span>
-                    <span class="review-badge" th:text="${product.reviewSummary}">Very Positive</span>
+                <div th:if="${product.reviewSummary != null}" style="background:#1b2838;border-radius:3px;padding:.8rem;margin-bottom:.75rem">
+                    <div style="font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem">Overall Reviews</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#66c0f4" th:text="${product.reviewSummary}"></div>
                 </div>
                 <div th:if="${product.developer != null}" class="meta-row">
                     <span class="label">Developer:</span>
@@ -176,7 +168,13 @@
                         <span th:if="${product.price == 0}" class="free-price">Free To Play</span>
                     </div>
 
-                    <form th:if="${owned == null or !owned}" th:action="@{/cart/add}" method="post" style="margin-top:1rem">
+                    <!-- Free game: claim directly -->
+                    <form th:if="${product.price == 0 and (owned == null or not owned)}" action="/store/claim-free" method="post" style="margin-top:1rem">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <button type="submit" class="btn-buy">Get Free</button>
+                    </form>
+                    <!-- Paid game: add to cart -->
+                    <form th:if="${product.price > 0 and (owned == null or not owned)}" action="/cart/add" method="post" style="margin-top:1rem">
                         <input type="hidden" name="productId" th:value="${product.id}">
                         <button type="submit" class="btn-buy">Add to Cart</button>
                     </form>
@@ -188,13 +186,14 @@
 </div>
 
 <!-- Content Area -->
-<div class="content-area">
-    <section>
-        <h2>About This Game</h2>
-        <div class="about-content">
-            <p th:text="${product.aboutTheGame != null ? product.aboutTheGame : product.description}">Game description</p>
-        </div>
-    </section>
+    <div class="content-area">
+        <section>
+            <h2>About This Game</h2>
+            <div class="about-content">
+                <p th:if="${product.aboutTheGame != null}" th:utext="${product.aboutTheGame}">Game description</p>
+                <p th:if="${product.aboutTheGame == null}" th:text="${product.description}">Game description</p>
+            </div>
+        </section>
 
     <section>
         <h2>System Requirements</h2>
@@ -227,103 +226,87 @@
     <span th:text="#{footer.copy}">© 2026 Steam Store</span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}">All rights reserved</span>
 </footer>
 
-<script th:inline="javascript">
-/*<![CDATA[*/
-let currentIndex = 0;
-let mediaItems = [];
-const mainImage = document.getElementById('mainImage');
-const mainVideo = document.getElementById('mainVideo');
-const thumbsContainer = document.getElementById('thumbs');
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	var currentIndex = 0;
+	var mediaItems = [];
+	var mainImage = document.getElementById('mainImage');
+	var mainVideo = document.getElementById('mainVideo');
+	var ytDiv = document.getElementById('youtubePlayer');
+	var thumbsContainer = document.getElementById('thumbs');
+	var dashPlayer = null;
+	var ytPlayerReady = false;
 
-// Initialize
-const headerUrl = /*[[${product.headerImageUrl}]]*/ '';
-const trailerUrl = /*[[${product.trailerVideoUrl}]]*/ null;
-const ss1 = /*[[${product.screenshot1Url}]]*/ null;
-const ss2 = /*[[${product.screenshot2Url}]]*/ null;
-const ss3 = /*[[${product.screenshot3Url}]]*/ null;
-const ss4 = /*[[${product.screenshot4Url}]]*/ null;
-const ss5 = /*[[${product.screenshot5Url}]]*/ null;
+	var headerUrl = /*[[${product.headerImageUrl}]]*/ '';
+	var trailerRaw = /*[[${product.trailerVideoUrl}]]*/ null;
+	var trailerUrls = trailerRaw ? trailerRaw.split('|||') : [];
+	var youtubeRaw = /*[[${product.youtubeVideoId}]]*/ null;
+	var youtubeIds = youtubeRaw ? youtubeRaw.split(',') : [];
+	var ss1 = /*[[${product.screenshot1Url}]]*/ null;
+	var ss2 = /*[[${product.screenshot2Url}]]*/ null;
+	var ss3 = /*[[${product.screenshot3Url}]]*/ null;
+	var ss4 = /*[[${product.screenshot4Url}]]*/ null;
+	var ss5 = /*[[${product.screenshot5Url}]]*/ null;
 
-if (trailerUrl) mediaItems.push({type:'video', src:trailerUrl});
-if (headerUrl) mediaItems.push({type:'image', src:headerUrl});
-if (ss1) mediaItems.push({type:'image', src:ss1});
-if (ss2) mediaItems.push({type:'image', src:ss2});
-if (ss3) mediaItems.push({type:'image', src:ss3});
-if (ss4) mediaItems.push({type:'image', src:ss4});
-if (ss5) mediaItems.push({type:'image', src:ss5});
+	// YouTube embeds first in carousel
+	youtubeIds.forEach(function(id) {
+		id = id.trim();
+		if (id) mediaItems.push({type:'youtube', src:id});
+	});
+	trailerUrls.forEach(function(url) {
+		mediaItems.push({type:'video', src:url});
+	});
+	if (ss1) mediaItems.push({type:'image', src:ss1});
+	if (ss2) mediaItems.push({type:'image', src:ss2});
+	if (ss3) mediaItems.push({type:'image', src:ss3});
+	if (ss4) mediaItems.push({type:'image', src:ss4});
+	if (ss5) mediaItems.push({type:'image', src:ss5});
 
-// Load thumbnails
-mediaItems.forEach((item, idx) => {
-    const img = document.createElement('img');
-    img.src = item.type === 'video' ? headerUrl : item.src;
-    img.className = 'carousel-thumb' + (idx === 0 ? ' active' : '');
-    img.onclick = () => selectMedia(idx);
-    thumbsContainer.appendChild(img);
-});
+	mediaItems.forEach(function(item, idx) {
+		var img = document.createElement('img');
+		img.src = item.type === 'youtube' ? 'https://img.youtube.com/vi/' + item.src + '/hqdefault.jpg' : (item.type === 'video' ? headerUrl : item.src);
+		img.className = 'carousel-thumb' + (idx === 0 ? ' active' : '');
+		img.onclick = function() { selectMedia(idx); };
+		thumbsContainer.appendChild(img);
+	});
 
-function selectMedia(idx) {
-    if (idx < 0 || idx >= mediaItems.length) return;
-    currentIndex = idx;
-    const item = mediaItems[idx];
+	if (mediaItems.length > 0) selectMedia(0);
 
-    document.querySelectorAll('.carousel-thumb').forEach((t, i) => {
-        t.classList.toggle('active', i === idx);
-    });
+	function selectMedia(idx) {
+		if (idx < 0 || idx >= mediaItems.length) return;
+		currentIndex = idx;
+		var item = mediaItems[idx];
 
-    if (item.type === 'video') {
-        mainImage.style.display = 'none';
-        mainVideo.style.display = 'block';
-        mainVideo.src = item.src;
-        mainVideo.play();
-        document.getElementById('playBtn').textContent = '⏸';
-    } else {
-        mainVideo.pause();
-        mainVideo.style.display = 'none';
-        mainImage.style.display = 'block';
-        mainImage.src = item.src;
-        document.getElementById('playBtn').textContent = '▶';
-    }
+		document.querySelectorAll('.carousel-thumb').forEach(function(t, i) {
+			t.classList.toggle('active', i === idx);
+		});
 
-    document.getElementById('counter').textContent = (idx + 1) + ' / ' + mediaItems.length;
-}
+		// Hide everything first
+		if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
+		mainVideo.pause();
+		mainVideo.classList.add('hidden');
+		mainVideo.src = '';
+		mainImage.style.display = 'none';
+		ytDiv.classList.add('hidden');
+		ytDiv.innerHTML = '';
 
-function nextMedia() {
-    selectMedia((currentIndex + 1) % mediaItems.length);
-}
+		if (item.type === 'youtube') {
+			ytDiv.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + item.src + '?autoplay=1&mute=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+			ytDiv.classList.remove('hidden');
+		} else if (item.type === 'video') {
+			mainVideo.classList.remove('hidden');
+			mainVideo.src = item.src;
+			mainVideo.load();
+			mainVideo.play().catch(function(){});
+		} else {
+			mainImage.style.display = 'block';
+			mainImage.src = item.src;
+		}
+	}
 
-function prevMedia() {
-    selectMedia((currentIndex - 1 + mediaItems.length) % mediaItems.length);
-}
-
-function togglePlay() {
-    const item = mediaItems[currentIndex];
-    if (item.type === 'video') {
-        if (mainVideo.paused) {
-            mainVideo.play();
-            document.getElementById('playBtn').textContent = '⏸';
-        } else {
-            mainVideo.pause();
-            document.getElementById('playBtn').textContent = '▶';
-        }
-    }
-}
-
-function toggleFullscreen() {
-    const container = document.querySelector('.main-media-container');
-    if (!document.fullscreenElement) {
-        container.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
-}
-
-// Keyboard shortcuts
-document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') nextMedia();
-    if (e.key === 'ArrowLeft') prevMedia();
-    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-});
-/*]]>*/
-</script>
-</body>
-</html>
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'ArrowRight') selectMedia(currentIndex + 1);
+		if (e.key === 'ArrowLeft') selectMedia(currentIndex - 1);
+	});
+	/*]]>*/
+	</script>

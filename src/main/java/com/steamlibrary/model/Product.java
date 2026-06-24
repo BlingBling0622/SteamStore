@@ -35,9 +35,10 @@ public class Product {
     private int discountPercent = 0;
 
     private String headerImageUrl;
+
+    @Column(name = "capsule_image_url")
     private String capsuleImageUrl;
 
-    // New media fields for enhanced game detail page
     @Column(name = "screenshot1url")
     private String screenshot1Url;
     @Column(name = "screenshot2url")
@@ -49,10 +50,22 @@ public class Product {
     @Column(name = "screenshot5url")
     private String screenshot5Url;
 
-    private String trailerVideoUrl; // WebM video URL
-    private String backgroundImageUrl; // Large background image
+    @Column(name = "trailer_video_url", length = 4000)
+    private String trailerVideoUrl; // WebM video URLs, separated by |||
 
-    @Column(length = 1000)
+    @Column(name = "youtube_video_id", length = 500)
+    private String youtubeVideoId; // YouTube video IDs, separated by commas
+
+    @Column(name = "review_positive")
+    private Integer reviewPositive;
+    @Column(name = "review_negative")
+    private Integer reviewNegative;
+    @Column(name = "review_total")
+    private Integer reviewTotal;
+    @Column(name = "review_score")
+    private Integer reviewScore;
+
+    @Column(length = 10000)
     private String aboutTheGame; // Longer "About" section
 
     // e.g. "Action, RPG, Open World"

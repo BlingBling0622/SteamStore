@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Store Link Diagnostic</title>
+    <style>
+        body {
+            background: #1b2838;
+            color: #c6d4df;
+            font-family: Arial;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #fff; }
+        .test-section {
+            background: #16202d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .test-card {
+            background: #2a475e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all .3s;
+        }
+        .test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.8);
+        }
+        a {
+            color: #66c0f4;
+            text-decoration: none;
+            display: block;
+        }
+        .status { color: #a4d007; font-weight: bold; }
+        .error { color: #ff4444; font-weight: bold; }
+        #log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .btn {
+            background: #5c7e10;
+            color: #d2e885;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn:hover { background: #6d9314; }
+        img { max-width: 200px; border: 2px solid #4b6a88; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Store Link Diagnostic Tool</h1>
+
+    <div class="test-section">
+        <h2>Test 1: Direct Links</h2>
+        <div class="test-card">
+            <a href="/store/game/1" id="link1">Click here → Game #1 (Elden Ring)</a>
+        </div>
+        <div class="test-card">
+            <a href="/store/game/131" id="link2">Click here → Game #131 (War Thunder)</a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: JavaScript Navigation</h2>
+        <button class="btn" onclick="testNavigate(1)">Navigate to Game 1</button>
+        <button class="btn" onclick="testNavigate(131)">Navigate to Game 131</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Simulated Store Card (exact copy)</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem">
+            <a href="/store/game/1" class="test-card" style="text-decoration:none;color:inherit">
+                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_616x353.jpg"
+                     style="width:100%;height:auto;display:block;border-radius:3px 3px 0 0">
+                <div style="padding:15px">
+                    <h3 style="color:#fff;margin:0 0 10px 0">Elden Ring</h3>
+                    <div style="color:#66c0f4;font-size:14px">Very Positive</div>
+                    <div style="color:#a4d007;font-size:18px;font-weight:bold;margin-top:10px">$59.99</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Check Store Page</h2>
+        <button class="btn" onclick="checkStorePage()">Analyze Store Page</button>
+        <button class="btn" onclick="window.location.href='/store'">Go to Real Store Page</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Diagnostic Log:</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(msg, isError = false) {
+            const color = isError ? '#ff4444' : '#0f0';
+            log.innerHTML += `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            log.scrollTop = log.scrollHeight;
+            console.log(msg);
+        }
+
+        addLog('✓ Diagnostic page loaded');
+
+        // Track all clicks
+        document.addEventListener('click', function(e) {
+            addLog(`Click detected on: ${e.target.tagName} (${e.target.className || 'no class'})`);
+            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                const link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
+                addLog(`→ Link target: ${link.href}`);
+            }
+        });
+
+        // Test direct navigation
+        function testNavigate(gameId) {
+            addLog(`Attempting to navigate to /store/game/${gameId}...`);
+            try {
+                window.location.href = `/store/game/${gameId}`;
+                addLog('✓ Navigation initiated');
+            } catch(e) {
+                addLog(`✗ Navigation failed: ${e.message}`, true);
+            }
+        }
+
+        // Check store page
+        function checkStorePage() {
+            addLog('Fetching store page...');
+            fetch('/store')
+                .then(res => {
+                    addLog(`✓ Store page responds with status: ${res.status}`);
+                    return res.text();
+                })
+                .then(html => {
+                    const linkCount = (html.match(/href="\/store\/game\/\d+"/g) || []).length;
+                    addLog(`✓ Found ${linkCount} game links in HTML`);
+
+                    const hasGameGrid = html.includes('class="game-grid"');
+                    addLog(hasGameGrid ? '✓ game-grid found' : '✗ game-grid NOT found', !hasGameGrid);
+
+                    const hasGameCard = html.includes('class="game-card"');
+                    addLog(hasGameCard ? '✓ game-card found' : '✗ game-card NOT found', !hasGameCard);
+                })
+                .catch(e => {
+                    addLog(`✗ Error fetching store: ${e.message}`, true);
+                });
+        }
+
+        // Run initial check
+        addLog('Running initial diagnostics...');
+        addLog(`Current URL: ${window.location.href}`);
+        addLog(`Browser: ${navigator.userAgent}`);
+
+        // Check if links work
+        const links = document.querySelectorAll('a[href^="/store/game/"]');
+        addLog(`Found ${links.length} test links on this page`);
+
+        links.forEach((link, i) => {
+            link.addEventListener('click', function(e) {
+                addLog(`Link ${i+1} clicked: ${this.href}`);
+            });
+        });
+
+        addLog('✓ All diagnostics ready. Try clicking the tests above!');
+    </script>
+</body>
+</html>
