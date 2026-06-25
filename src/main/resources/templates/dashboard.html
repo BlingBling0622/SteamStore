@@ -72,17 +72,17 @@ footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding
 </head>
 <body>
 
-<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.65rem 0;position:sticky;top:0;z-index:100">
+<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
     <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
-        <a href="/" style="font-size:1.4rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
-        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px">Store</a>
-        <a href="/dashboard" style="color:#66c0f4;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px;background:rgba(103,193,245,.12)">Library</a>
-        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.85rem;padding:.35rem .6rem;border-radius:2px">Profile</a>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:.7rem">
-            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.85rem">Cart</a>
-            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.8rem" sec:authentication="name"></span>
+        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
+        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
+        <a href="/dashboard" style="color:#66c0f4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px;background:rgba(103,193,245,.12)">Library</a>
+        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
+            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
+            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
-                <button type="submit" style="padding:.35rem .8rem;background:#5c7e10;color:#d2e885;font-size:.8rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
+                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
             </form>
             <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.35rem .8rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.8rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none">Sign In</a>
             <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.25rem .4rem;border-radius:2px;font-size:.75rem;cursor:pointer">
