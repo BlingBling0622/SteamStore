@@ -74,6 +74,7 @@
 
         footer{background:#171a21;border-top:1px solid #000;padding:2rem;text-align:center;color:#8f98a0;font-size:.8rem}
 
+/* DLC */        .dlc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem;margin-top:.75rem}        .dlc-card{background:#1b2838;border:1px solid rgba(255,255,255,.06);border-radius:3px;overflow:hidden;text-decoration:none;color:inherit;display:flex;gap:.75rem;align-items:center;padding:.75rem;transition:border-color .15s}        .dlc-card:hover{border-color:#66c0f4}        .dlc-card img{width:120px;height:56px;object-fit:cover;border-radius:2px;flex-shrink:0}        .dlc-info{flex:1;min-width:0}        .dlc-info h4{font-size:.85rem;color:#fff;font-weight:400;margin-bottom:.15rem}        .dlc-info .dlc-price{font-size:.8rem;color:#a4d007;font-weight:700}        .dlc-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:.5rem}        .dlc-toggle .arrow{transition:transform .3s;font-size:.8rem}        .dlc-toggle.open .arrow{transform:rotate(90deg)}        .dlc-content{overflow:hidden;max-height:0;transition:max-height .4s ease}        .dlc-content.open{max-height:2000px}
         @media(max-width:968px){
             .hero-layout{grid-template-columns:1fr}
             .sys-grid{grid-template-columns:1fr}
@@ -194,6 +195,7 @@
                 <p th:if="${product.aboutTheGame == null}" th:text="${product.description}">Game description</p>
             </div>
         </section>
+<section th:if="${dlcs != null and !dlcs.isEmpty()}">        <div class="dlc-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">            <h2 style="margin:0;display:flex;align-items:center;gap:.5rem"><span class="arrow">▶</span> DLC - Downloadable Content</h2>        </div>        <div class="dlc-content">            <div class="dlc-grid">                <a th:each="dlc : ${dlcs}" th:href="@{/store/game/{id}(id=${dlc.id})}" class="dlc-card">                    <img th:src="${dlc.headerImageUrl}" th:alt="${dlc.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">                    <div class="dlc-info">                        <h4 th:text="${dlc.name}"></h4>                        <div th:if="${dlc.price > 0}" class="dlc-price" th:text="${cSym} + ${#numbers.formatDecimal(dlc.price * cRate, 1, cDec)}"></div>                        <div th:if="${dlc.price == 0}" class="dlc-price">Free</div>                    </div>                </a>            </div>        </div>    </section>
 
     <section>
         <h2>System Requirements</h2>

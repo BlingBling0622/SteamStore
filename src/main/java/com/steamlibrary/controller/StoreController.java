@@ -1,7 +1,9 @@
 package com.steamlibrary.controller;
 
 import com.steamlibrary.model.Order;
+import com.steamlibrary.model.Product;
 import com.steamlibrary.model.User;
+import com.steamlibrary.repository.ProductRepository;
 import com.steamlibrary.service.StoreService;
 import com.steamlibrary.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +19,17 @@ public class StoreController {
 
     private final StoreService storeService;
     private final UserService userService;
+    private final ProductRepository productRepository;
 
     @GetMapping("/store")
-    public String store(Model model, Authentication auth) {
-        model.addAttribute("products", storeService.getAllProducts());
+    public String store(@RequestParam(required = false) String q, Model model, Authentication auth) {
+        // Exclude DLCs from main listing, but include in search
+        if (q != null && !q.isBlank()) {
+            model.addAttribute("products", productRepository.findByNameContainingIgnoreCase(q.trim()));
+            model.addAttribute("searchQuery", q.trim());
+        } else {
+            model.addAttribute("products", productRepository.findByIsDlcFalse());
+        }
         if (auth != null) {
             User user = userService.findByUsername(auth.getName());
             model.addAttribute("ownedIds", storeService.getOwnedProductIds(user));
@@ -31,8 +40,15 @@ public class StoreController {
 
     @GetMapping("/store/game/{id}")
     public String gameDetail(@PathVariable Long id, Model model, Authentication auth) {
-        model.addAttribute("product", storeService.getProduct(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found")));
+        Product product = storeService.getProduct(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        model.addAttribute("product", product);
+
+        // DLCs for this game
+        if (product.getIsDlc() != null && !product.getIsDlc()) {
+            model.addAttribute("dlcs", productRepository.findByParentGameId(id));
+        }
+
         if (auth != null) {
             User user = userService.findByUsername(auth.getName());
             model.addAttribute("owned", storeService.getOwnedProductIds(user).contains(id));

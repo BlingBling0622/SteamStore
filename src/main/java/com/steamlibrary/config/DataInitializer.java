@@ -3,6 +3,7 @@ package com.steamlibrary.config;
 import com.steamlibrary.model.Product;
 import com.steamlibrary.repository.ProductRepository;
 import com.steamlibrary.service.SteamAssetService;
+import com.steamlibrary.service.SteamDlcService;
 import com.steamlibrary.service.SteamMediaCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final SteamAssetService steamAssetService;
     private final SteamMediaCache mediaCache;
+    private final SteamDlcService steamDlcService;
 
     @Override
     public void run(String... args) {
@@ -211,7 +213,7 @@ public class DataInitializer implements CommandLineRunner {
         games.add(p("War Thunder", "Join now and take part in major battles on land, in the air, and at sea, fighting with millions of players from all over the world in an ever-evolving environment. Over 2,500 highly detailed aircraft, tanks, warships, helicopters and other combat vehicles.", 0.00, 0, "https://cdn.akamai.steamstatic.com/steam/apps/236390/header.jpg", "Free to Play, Military, Simulation, Multiplayer, Tanks, Aviation", "Very Positive", "Gaijin Entertainment", "Gaijin Entertainment", false));
 
         if (isFresh) {
-            productRepository.saveAll(games);
+            games = productRepository.saveAll(games); // capture managed entities with IDs
             System.out.println("✅ Initialized " + games.size() + " games in the store");
         }
 
@@ -226,6 +228,44 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
         if (synced > 0) log.info("📦 Synced {} games from cache", synced);
+
+        // ── Fetch DLCs from Steam API ──
+        if (isFresh) {
+            List<Product> dlcs = new ArrayList<>();
+            try { dlcs = steamDlcService.fetchDlcs(); } catch (Exception e) {}
+
+            // Find parent DB IDs by matching Steam app IDs in header URLs
+            for (Product game : games) {
+                String appId = extractAppId(game.getHeaderImageUrl());
+                if (appId == null) continue;
+                long steamAppId = Long.parseLong(appId);
+
+                if (steamAppId == 1245620L) {
+                    dlcs.addAll(createDlc("Shadow of the Erdtree", "The Elden Ring expansion", 39.99, 2778580, game.getId()));
+                    dlcs.addAll(createDlc("Elden Ring - Deluxe Edition Upgrade", "Upgrade to Deluxe", 19.99, 1892850, game.getId()));
+                } else if (steamAppId == 1091500L) {
+                    dlcs.addAll(createDlc("Cyberpunk 2077: Phantom Liberty", "New spy-thriller expansion", 29.99, 2138330, game.getId()));
+                } else if (steamAppId == 292030L) {
+                    dlcs.addAll(createDlc("The Witcher 3: Blood and Wine", "Travel to Toussaint", 19.99, 378648, game.getId()));
+                    dlcs.addAll(createDlc("The Witcher 3: Hearts of Stone", "New adventure awaits", 9.99, 378649, game.getId()));
+                } else if (steamAppId == 489830L) {
+                    dlcs.addAll(createDlc("Skyrim: Dawnguard", "Vampire Lord expansion", 19.99, 211720, game.getId()));
+                    dlcs.addAll(createDlc("Skyrim: Dragonborn", "Journey to Solstheim", 19.99, 226880, game.getId()));
+                    dlcs.addAll(createDlc("Skyrim: Hearthfire", "Build your own home", 4.99, 220760, game.getId()));
+                } else if (steamAppId == 1086940L) {
+                    dlcs.addAll(createDlc("Baldur's Gate 3 - Digital Deluxe Upgrade", "Deluxe content pack", 9.99, 2375050, game.getId()));
+                } else if (steamAppId == 1174180L) {
+                    dlcs.addAll(createDlc("Red Dead Redemption 2: Special Edition Content", "Bonus content", 0.00, 1200240, game.getId()));
+                } else if (steamAppId == 730L) {
+                    dlcs.addAll(createDlc("CS2 - Prime Status Upgrade", "Premium matchmaking", 14.99, 1245150, game.getId()));
+                }
+            }
+
+            if (!dlcs.isEmpty()) {
+                productRepository.saveAll(dlcs);
+                log.info("🎮 Added {} DLCs", dlcs.size());
+            }
+        }
 
         // ── Load media from cache, fetch missing from API, auto-save cache ──
         final List<Product> gameList = isFresh ? new ArrayList<>(games) : productRepository.findAll();
@@ -338,6 +378,27 @@ public class DataInitializer implements CommandLineRunner {
     /** Build a Steam CDN URL for a given app ID and filename */
     private String cdn(String appId, String file) {
         return STEAM_CDN + "/" + appId + "/" + file;
+    }
+
+    /** Create a DLC product entry with real Steam app ID */
+    private List<Product> createDlc(String name, String desc, double price, long dlcAppId, Long parentAppId) {
+        Product p = new Product();
+        p.setName(name);
+        p.setDescription(desc);
+        p.setPrice(price);
+        p.setDiscountPercent(0);
+        p.setHeaderImageUrl(cdn(String.valueOf(dlcAppId), "header.jpg"));
+        p.setCapsuleImageUrl(cdn(String.valueOf(dlcAppId), "capsule_616x353.jpg"));
+        p.setScreenshot1Url(cdn(String.valueOf(dlcAppId), "library_hero.jpg"));
+        p.setTags("DLC");
+        p.setReviewSummary("");
+        p.setDeveloper("");
+        p.setPublisher("");
+        p.setFeatured(false);
+        p.setIsDlc(true);
+        p.setParentGameId(parentAppId);
+        p.setAboutTheGame(desc);
+        return List.of(p);
     }
 
     /** Apply cached media data to a product */

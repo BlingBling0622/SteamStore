@@ -78,4 +78,10 @@ public class Product {
     private String publisher;
 
     private Boolean featured = false;
+
+    @Column(name = "is_dlc")
+    private Boolean isDlc = false;
+
+    @Column(name = "parent_game_id")
+    private Long parentGameId; // links DLC to its base game
 }
