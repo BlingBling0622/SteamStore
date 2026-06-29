@@ -20,6 +20,7 @@ public class StoreService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final MessageService messageService;
 
     public List<Product> getAllProducts() { return productRepository.findAll(); }
     public List<Product> getFeaturedProducts() { return productRepository.findByFeaturedTrue(); }
@@ -76,6 +77,23 @@ public class StoreService {
 
         cartRepository.deleteByUser(user);
 
+        // Send purchase notification
+        if (!allProducts.isEmpty()) {
+            String productNames = allProducts.stream()
+                    .map(Product::getName)
+                    .collect(Collectors.joining(", "));
+            messageService.createNotification(user,
+                    "Purchase completed: " + productNames + " ($" + String.format("%.2f", total) + ")",
+                    Message.MessageType.PURCHASE);
+        }
+
+        // Send library notifications for newly acquired products
+        for (Product p : newProducts) {
+            messageService.createNotification(user,
+                    "\"" + p.getName() + "\" has been added to your library",
+                    Message.MessageType.LIBRARY);
+        }
+
         log.info("Order created: user={}, products={}, new={}, skipped={}, total={}",
                 user.getUsername(), allProducts.size(), newProducts.size(), skipped, total);
         return order;
@@ -94,6 +112,12 @@ public class StoreService {
         order.setProducts(List.of(product));
         order.setTotal(0.0);
         orderRepository.save(order);
+
+        // Send library notification
+        messageService.createNotification(user,
+                "\"" + product.getName() + "\" has been added to your library",
+                Message.MessageType.LIBRARY);
+
         log.info("Free game claimed: user={}, game={}", user.getUsername(), product.getName());
     }
 

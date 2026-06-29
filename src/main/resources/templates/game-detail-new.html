@@ -4,24 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam-common.css">
     <title th:text="${product.name} + ' on Steam'">Game on Steam</title>
     <link rel="stylesheet" href="/css/game-detail.css">
 </head>
 <body>
-<!-- Navigation (same as store page) -->
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store">Store</a>
-        <div class="nav-right">
-            <a href="/dashboard" class="btn-lib">Library</a>
-            <a href="/cart" class="cart-btn">🛒 Cart</a>
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
-                <option value="en" selected>EN</option>
-            </select>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
 
 <!-- Hero Section -->
 <div class="hero">

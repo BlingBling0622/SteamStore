@@ -1,282 +1,72 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
 <title>Library - Steam</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
-.container{display:flex;flex:1}
-
-/* Sidebar */
-.sidebar{width:220px;background:#16202d;padding:1rem;border-right:1px solid #000;overflow-y:auto;flex-shrink:0}
-.sidebar h3{font-size:.7rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 .5rem;font-weight:600}
-.sidebar h3:first-child{margin-top:0}
-.sidebar ul{list-style:none}
-.sidebar li{margin-bottom:2px}
-.sidebar a{display:flex;justify-content:space-between;align-items:center;color:#c6d4df;text-decoration:none;padding:.35rem .5rem;border-radius:2px;font-size:.85rem;transition:.15s}
-.sidebar a:hover{background:rgba(103,193,245,.15);color:#66c0f4}
-.sidebar a.active{background:#66c0f4;color:#fff}
-.sidebar .badge{font-size:.7rem;color:#8f98a0;background:#1b2838;padding:.1rem .35rem;border-radius:8px}
-.sidebar a.active .badge{background:rgba(0,0,0,.3);color:#fff}
-
-/* Main */
-.main-content{flex:1;padding:1.5rem 2rem;overflow-y:auto}
-
-/* Stats */
-.stats{display:flex;gap:1rem;margin-bottom:1.5rem}
-.stat-card{flex:1;background:#16202d;padding:1rem;border-radius:4px;border:1px solid #000}
-.stat-card .label{font-size:.7rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem}
-.stat-card .value{font-size:1.5rem;color:#66c0f4;font-weight:300}
-
-/* Search */
-.search-bar{margin-bottom:1.5rem}
-.search-bar input{width:100%;max-width:350px;padding:.55rem .8rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
-.search-bar input:focus{outline:none;border-color:#66c0f4}
-
-/* Game Grid */
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem}
-.game-card{background:#16202d;border-radius:4px;overflow:hidden;text-decoration:none;color:inherit;display:block;position:relative;transition:all .2s}
-.game-card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,.5)}
-.game-card.hidden{display:none}
-.game-card img{width:100%;height:145px;object-fit:cover;display:block}
-.game-info{padding:.75rem .85rem}
-.game-info h4{font-size:.9rem;color:#fff;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.2rem}
-.game-meta{font-size:.78rem;color:#8f98a0}
-
-/* Favorite button */
-.fav-btn{position:absolute;top:.35rem;right:.35rem;width:26px;height:26px;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;cursor:pointer;z-index:5;opacity:0;transition:all .15s;border:none}
-.fav-btn:hover{background:#66c0f4;transform:scale(1.15)}
-.fav-btn.favorited{opacity:1;color:#f44}
-.game-card:hover .fav-btn{opacity:.75}
-
-/* Empty */
-.empty-state{text-align:center;padding:3rem 1rem;color:#8f98a0;display:none}
-.empty-state h3{font-size:1.1rem;color:#fff;margin-bottom:.5rem}
-.btn-primary{display:inline-block;padding:.6rem 1.5rem;background:#5c7e10;color:#d2e885;font-weight:700;text-decoration:none;border-radius:2px;font-size:.85rem;margin-top:.75rem}
-.btn-primary:hover{background:#6d9314}
-
-/* Alert */
-.alert{padding:.6rem 1rem;border-radius:2px;margin-bottom:1rem;font-size:.85rem}
-.alert-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007}
-
-footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.2rem;color:#8f98a0;font-size:.75rem;margin-top:auto}
-
-@media(max-width:768px){
-    .sidebar{display:none}
-    .main-content{padding:1rem}
-    .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-}
-</style>
+<style>.main{padding:1.5rem 2rem}.sbar h3{font-size:.7rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .4rem;font-weight:600}.sbar h3:first-child{margin-top:0}
+.sbar a{display:flex;justify-content:space-between;align-items:center;color:var(--text);padding:.3rem .5rem;border-radius:2px;font-size:.85rem}
+.sbar a:hover,.sbar a.on{background:rgba(103,193,245,.15);color:var(--accent)}.sbar a.on{background:var(--accent);color:var(--white)}
+.sbar .badge{font-size:.7rem;color:var(--muted);background:var(--bg);padding:.1rem .35rem;border-radius:8px}.sbar a.on .badge{background:rgba(0,0,0,.3);color:var(--white)}
+.favbtn{position:absolute;top:.35rem;right:.35rem;width:26px;height:26px;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--white);cursor:pointer;z-index:5;opacity:0;transition:.12s;border:none}
+.favbtn:hover{background:var(--accent)}.favbtn.on{opacity:1;color:#f44}.gcard:hover .favbtn{opacity:.75}</style>
 </head>
 <body>
-
-<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
-    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
-        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
-        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
-        <a href="/dashboard" style="color:#66c0f4;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px;background:rgba(103,193,245,.12)">Library</a>
-        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
-            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
-            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
-                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
-            </form>
-            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.35rem .8rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.8rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none">Sign In</a>
-            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.25rem .4rem;border-radius:2px;font-size:.75rem;cursor:pointer">
-                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
-                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
-                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
-                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
-                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
-                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
-                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
-                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
-            </select>
-        </div>
-    </div>
-</nav>
-
-<div class="container">
-    <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar">
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
+<div class="wrap flex flex1">
+    <aside class="side sbar">
         <h3>Library</h3>
-        <ul id="sidebarLinks">
-            <li><a href="#" data-filter="all" class="active">All Games <span class="badge" th:text="${gameCount}">0</span></a></li>
-            <li><a href="#" data-filter="favorites">Favorites <span class="badge" id="favBadge">0</span></a></li>
-        </ul>
-        <h3>Collections</h3>
-        <ul id="collectionLinks">
-            <li th:each="tag : ${allTags}">
-                <a href="#" th:attr="data-tag=${tag}"><span th:text="${tag}"></span></a>
-            </li>
-        </ul>
+        <a href="#" class="on" data-filter="all">All Games <span class="badge" th:text="${gameCount}">0</span></a>
+        <a href="#" data-filter="favorites">Favorites <span class="badge" id="favBadge">0</span></a>
+<h3>Collections</h3><a th:each="tag:${allTags}" href="#" th:attr="data-tag=${tag}"><span th:text="${tag}"></span></a>
     </aside>
-
-    <!-- ========== MAIN CONTENT ========== -->
-    <main class="main-content">
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-
-        <!-- Stats -->
+    <div class="main flex1">
+        <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
         <div class="stats">
-            <div class="stat-card">
-                <div class="label">Games Owned</div>
-                <div class="value" th:text="${gameCount}">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Total Spent</div>
-                <div class="value" th:text="${cSym} + ${#numbers.formatDecimal(totalSpent * cRate, 1, cDec)}"></div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Favorites</div>
-                <div class="value" id="favCount">0</div>
-            </div>
+            <div class="stat"><div class="v" th:text="${gameCount}">0</div><div class="l">Games</div></div>
+            <div class="stat"><div class="v" th:text="${cSym}+${#numbers.formatDecimal(totalSpent*cRate,1,cDec)}"></div><div class="l">Spent</div></div>
+            <div class="stat"><div class="v" id="favCount">0</div><div class="l">Favorites</div></div>
         </div>
-
-        <!-- Search -->
-        <div class="search-bar">
-            <input type="text" placeholder="Search your library..." id="searchInput" oninput="doSearch()">
-        </div>
-
-        <!-- Empty state -->
-        <div th:if="${purchasedGames.isEmpty()}" class="empty-state" style="display:block">
-            <h3>Your library is empty</h3>
-            <p>Start building your collection by browsing the store</p>
-            <a href="/store" class="btn-primary">Browse Store</a>
-        </div>
-
-        <!-- No results -->
-        <div id="noResults" class="empty-state">
-            <h3>No games found</h3>
-            <p>Try a different filter or search term.</p>
-        </div>
-
-        <!-- Game Grid -->
-        <div th:if="${!purchasedGames.isEmpty()}" class="games-grid" id="gamesGrid">
-            <a class="game-card"
-               th:each="product : ${purchasedGames}"
-               th:href="@{/store/game/{id}(id=${product.id})}"
-               th:attr="data-name=${#strings.toLowerCase(product.name)},data-tags=${product.tags != null ? #strings.toLowerCase(product.tags) : ''},data-id=${product.id}">
-                <button class="fav-btn"
-                        th:data-id="${product.id}"
-                        th:classappend="${favoriteIds.contains(product.id) ? 'favorited' : ''}"
-                        th:text="${favoriteIds.contains(product.id) ? '♥' : '♡'}"
-                        onclick="toggleFav(this,event)" title="Favorite"></button>
-                <img th:src="${product.headerImageUrl}" th:alt="${product.name}"
-                     onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
-                <div class="game-info">
-                    <h4 th:text="${product.name}"></h4>
-                    <div class="game-meta" th:text="${product.developer}"></div>
-                </div>
+        <input type="text" placeholder="Search your library..." id="s" style="max-width:350px;margin-bottom:1rem" oninput="doSearch()">
+        <div th:if="${purchasedGames.isEmpty()}" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)">Your library is empty</h3><p>Browse the store to start your collection</p><a href="/store" class="btn btn-g mt1">Browse Store</a></div>
+        <div id="noRes" class="hidden" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)">No games found</h3><p>Try a different filter</p></div>
+        <div class="ggrid" id="grid" th:unless="${purchasedGames.isEmpty()}">
+            <a th:each="p:${purchasedGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="gcard"
+               th:attr="data-name=${#strings.toLowerCase(p.name)},data-tags=${p.tags!=null?#strings.toLowerCase(p.tags):''},data-id=${p.id}">
+                <button class="favbtn" th:attr="data-id=${p.id}" th:classappend="${favoriteIds.contains(p.id)?'on':''}" th:text="${favoriteIds.contains(p.id)?'&#9829;':'&#9825;'}" onclick="toggleFav(this,event)"></button>
+                <img th:src="${p.headerImageUrl}" th:alt="${p.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+                <div class="gbody"><div class="gtitle" th:text="${p.name}"></div><div class="fs-xs muted" th:text="${p.developer}"></div></div>
             </a>
         </div>
-    </main>
+    </div>
 </div>
-
-<footer>&copy; 2026 Steam Store · Not affiliated with Valve Corporation</footer>
-
+<footer>&copy; 2026 Steam Store &middot; Not affiliated with Valve Corporation</footer>
 <script>
-// Current filter: 'all', 'favorites', or tag string
-var currentFilter = 'all';
-
-// ===== FAVORITE TOGGLE =====
-function toggleFav(btn, evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    var id = btn.getAttribute('data-id');
-    fetch('/dashboard/favorite', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'productId=' + id
-    }).then(function(r){return r.json()}).then(function(d){
-        if (d.added) { btn.classList.add('favorited'); btn.textContent = '♥'; }
-        else { btn.classList.remove('favorited'); btn.textContent = '♡'; }
-        updateFavCount(d.count);
-        if (currentFilter === 'favorites') applyFilter();
+var cur='all';
+function toggleFav(b,e){e.stopPropagation();e.preventDefault();var id=b.getAttribute('data-id');
+fetch('/dashboard/favorite',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'productId='+id}).then(function(r){return r.json()}).then(function(d){
+b.classList.toggle('on',d.added);if(d.added){b.innerHTML='&#9829;'}else{b.innerHTML='&#9825;'}updateFav(d.count);if(cur==='favorites')apply();});}
+function updateFav(n){document.getElementById('favCount').textContent=n;var b=document.getElementById('favBadge');if(b)b.textContent=n;}
+function apply(){
+    var cards=document.querySelectorAll('#grid .gcard'),vis=0;
+    cards.forEach(function(c){var on=c.querySelector('.favbtn.on');
+        if(cur==='all'){c.classList.remove('hidden');vis++;}
+        else if(cur==='favorites'){if(on){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');}
+        else{var t=c.getAttribute('data-tags')||'';if(t.includes(cur.toLowerCase())){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');}
     });
+    var q=document.getElementById('s').value.trim().toLowerCase();if(q)doSearch();
+    document.getElementById('noRes').style.display=vis===0?'block':'none';
 }
-
-function updateFavCount(n) {
-    document.getElementById('favCount').textContent = n;
-    var b = document.getElementById('favBadge');
-    if (b) b.textContent = n;
+function doSearch(){
+    var q=document.getElementById('s').value.trim().toLowerCase(),vis=0;
+    document.querySelectorAll('#grid .gcard').forEach(function(c){if(c.classList.contains('hidden'))return;var n=c.getAttribute('data-name')||'';if(!q||n.includes(q)){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');});
+    document.getElementById('noRes').style.display=vis===0?'block':'none';
 }
-
-// ===== FILTER =====
-function setActive(el) {
-    document.querySelectorAll('.sidebar a').forEach(function(a){ a.classList.remove('active'); });
-    el.classList.add('active');
-}
-
-function doFilter(el) {
-    setActive(el);
-    var filter = el.getAttribute('data-filter');
-    var tag = el.getAttribute('data-tag');
-    if (filter) { currentFilter = filter; }
-    else if (tag) { currentFilter = tag; }
-    applyFilter();
-}
-
-function applyFilter() {
-    var cards = document.querySelectorAll('#gamesGrid .game-card');
-    var f = currentFilter;
-    var visible = 0;
-
-    if (f === 'all') {
-        for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('hidden'); }
-        visible = cards.length;
-    } else if (f === 'favorites') {
-        for (var i = 0; i < cards.length; i++) {
-            var b = cards[i].querySelector('.fav-btn');
-            if (b && b.classList.contains('favorited')) { cards[i].classList.remove('hidden'); visible++; }
-            else { cards[i].classList.add('hidden'); }
-        }
-    } else {
-        // Tag filter
-        var searchTag = f.toLowerCase();
-        for (var i = 0; i < cards.length; i++) {
-            var tags = cards[i].getAttribute('data-tags') || '';
-            if (tags.indexOf(searchTag) > -1) { cards[i].classList.remove('hidden'); visible++; }
-            else { cards[i].classList.add('hidden'); }
-        }
-    }
-    // Also re-apply search if any
-    var searchVal = (document.getElementById('searchInput').value || '').trim();
-    if (searchVal) doSearch();
-    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
-}
-
-// ===== SEARCH =====
-function doSearch() {
-    var val = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-    var cards = document.querySelectorAll('#gamesGrid .game-card');
-    var visible = 0;
-    for (var i = 0; i < cards.length; i++) {
-        if (cards[i].classList.contains('hidden')) continue; // already hidden by filter
-        var name = cards[i].getAttribute('data-name') || '';
-        if (!val || name.indexOf(val) > -1) { cards[i].classList.remove('hidden'); visible++; }
-        else { cards[i].classList.add('hidden'); }
-    }
-    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
-}
-
-// ===== INIT =====
 (function(){
-    // Attach click handlers to all sidebar links
-    var links = document.querySelectorAll('.sidebar a[data-filter], .sidebar a[data-tag]');
-    for (var i = 0; i < links.length; i++) {
-        links[i].addEventListener('click', function(e){
-            e.preventDefault();
-            doFilter(this);
-        });
-    }
-    // Init fav counts
-    var favBtns = document.querySelectorAll('#gamesGrid .fav-btn.favorited');
-    updateFavCount(favBtns.length);
+    document.querySelectorAll('.sbar a[data-filter],.sbar a[data-tag]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();
+        document.querySelectorAll('.sbar a').forEach(function(x){x.classList.remove('on')});a.classList.add('on');
+        cur=a.getAttribute('data-filter')||a.getAttribute('data-tag')||'all';apply();});});
+    updateFav(document.querySelectorAll('#grid .favbtn.on').length);
 })();
 </script>
-
 </body>
 </html>

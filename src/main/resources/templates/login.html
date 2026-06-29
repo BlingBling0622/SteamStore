@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam-common.css">
     <title th:text="#{login.title} + ' - Steam'">Sign In</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -32,28 +33,11 @@
         .link{text-align:center;color:#8f98a0;font-size:.875rem}
         .link a{color:#66c0f4;text-decoration:none}
         .link a:hover{text-decoration:underline}
-        footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.5rem;color:#8f98a0;font-size:.8rem;margin-top:auto}
+        footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.2rem;color:#8f98a0;font-size:.75rem;margin-top:auto}
     </style>
 </head>
 <body>
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="logo">STEAM<span>STORE</span></a>
-        <a href="/store" th:text="#{nav.store}">Store</a>
-        <div class="nav-right">
-            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
-                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
-                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
-                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
-                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
-                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
-                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
-                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
-                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
-            </select>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
 <div class="center">
     <div class="card">
         <h1 th:text="#{login.title}">Sign In</h1>

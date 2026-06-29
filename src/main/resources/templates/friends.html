@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css"><title>Friends - Steam</title>
+<style>
+.panel{display:flex;flex:1;overflow:hidden}.sb{width:280px;background:var(--bg2);padding:1rem;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;gap:.8rem}
+.sb h3{font-size:.68rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;font-weight:600}
+.sbox{position:relative}.sbox input{width:100%;padding:.45rem .65rem;font-size:.82rem}
+.sres{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);max-height:180px;overflow-y:auto;z-index:50;display:none}.sres.show{display:block}
+.sres .r{display:flex;align-items:center;justify-content:space-between;padding:.4rem .6rem;gap:.4rem;font-size:.8rem}
+.sres .r:hover{background:rgba(103,193,245,.1)}.sres .r .av{width:26px;height:26px;border-radius:2px;background:var(--border1);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden}.sres .r .av img{width:100%;height:100%;object-fit:cover}
+.pend{display:flex;align-items:center;gap:.45rem;padding:.35rem .3rem;border-radius:2px;background:rgba(103,193,245,.05);margin-bottom:3px;font-size:.78rem}
+.pend .info{flex:1;min-width:0}.pend .acts{display:flex;gap:.2rem;flex-shrink:0}
+.main2{flex:1;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:center;overflow-y:auto}
+.pcard{background:var(--bg2);border:1px solid var(--border3);border-radius:4px;padding:1.5rem;max-width:480px;width:100%}
+.pcard .hd{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.pcard .hd .fav{width:72px;height:72px}.pcard .hd h2{font-size:1.3rem;color:var(--white);font-weight:300}
+</style></head><body>
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
+<div class="panel flex1"><aside class="sb">
+<h3>ADD A FRIEND</h3><div class="sbox"><input type="text" placeholder="Search username/nickname..." id="q" oninput="doSearch()" onfocus="showRes()" autocomplete="off"><div class="sres" id="res"></div></div>
+<div th:if="${!pendingRequests.isEmpty()}"><h3>PENDING <span class="fs-xs muted" th:text="'('+${pendingCount}+')'"></span></h3>
+<div th:each="r:${pendingRequests}"><div class="pend">
+<div class="fav" style="width:26px;height:26px;font-size:.6rem"><img th:if="${r.senderAvatarUrl!=null and !r.senderAvatarUrl.isEmpty()}" th:src="${r.senderAvatarUrl}" alt=""><span th:unless="${r.senderAvatarUrl!=null and !r.senderAvatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(r.senderUsername.substring(0,1))}"></span></div>
+<div class="info"><div class="white fs-sm" th:text="${r.senderNickname}"></div><div class="fs-xs muted" th:text="${#temporals.format(r.createdAt,'MMM d')}"></div></div>
+<div class="acts"><form th:action="@{/friends/accept}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:var(--green);color:#d2e885">Accept</button></form>
+<form th:action="@{/friends/decline}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:#555;color:#aaa">Decline</button></form></div></div></div></div>
+<div style="flex:1"><h3>FRIENDS <span class="fs-xs muted" th:text="'('+${friendsCount}+')'"></span></h3>
+<div th:if="${friends.isEmpty()}" class="fs-sm muted p1">No friends yet.</div>
+<div class="flist"><div th:each="f:${friends}" class="fitem" th:data-id="${f.id}" th:data-username="${f.username}" th:data-nickname="${f.nickname}" th:data-email="${f.email}" th:data-avatar="${f.avatarUrl}" th:data-since="${f.since}" onclick="sel(this)"><div class="fav"><img th:if="${!f.avatarUrl.isEmpty()}" th:src="${f.avatarUrl}" alt=""><span th:if="${f.avatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(f.username.substring(0,1))}"></span></div><div class="flex1"><div class="white fs-sm" th:text="${f.nickname}"></div><div class="fs-xs" style="color:var(--green2)">&bull; Online</div></div></div></div></div>
+</aside>
+<main class="main2"><div th:if="${success}" class="alert alert-ok" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${success}"></div><div th:if="${error}" class="alert alert-err" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${error}"></div>
+<div id="empty" style="text-align:center;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:.5rem">&#128101;</div><h3 style="color:var(--white)">Select a friend</h3><p class="fs-sm">Choose from the list to view their profile</p></div>
+<div id="prof" class="pcard hidden"><div class="hd"><div class="fav av-lg" id="pa"><img id="pai" src="" alt="" class="hidden"><span id="pal"></span></div><div class="flex1"><h2 id="pn"></h2><div class="fs-sm muted" id="pe"></div><div class="fs-xs muted" id="ps"></div></div></div>
+<div id="pd" class="mb1"></div><div class="flex gap1"><a id="pmsg" href="#" class="btn btn-g">Send Message</a><a id="pprof" href="#" class="btn btn-b">View Profile</a><form id="prem" th:action="@{/friends/remove}" method="post" style="display:inline" onsubmit="return confirm('Remove?')"><input type="hidden" name="friendId" id="prid"><button class="btn btn-r">Remove</button></form></div></div>
+</main></div>
+<footer>&copy; 2026 Steam Store &middot; Not affiliated with Valve Corporation</footer>
+<script>
+var tmr;
+function doSearch(){
+    clearTimeout(tmr);
+    var q=document.getElementById('q').value.trim(), b=document.getElementById('res');
+    if(!q){b.classList.remove('show');b.innerHTML='';return}
+    tmr=setTimeout(function(){
+        fetch('/friends/search?q='+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(u){
+            var h='';
+            if(!u.length) h='<div style="padding:.4rem .6rem;color:var(--muted);font-size:.75rem">No users found</div>';
+            for(var i=0;i<u.length;i++){
+                var avatarHtml = u[i].avatarUrl ? '<img src="'+esc(u[i].avatarUrl)+'" alt="">' : u[i].username.charAt(0).toUpperCase();
+                h+='<div class="r"><div style="display:flex;align-items:center;gap:.4rem;min-width:0"><div class="av">'+avatarHtml+'</div><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(u[i].nickname)+'</span></div><form action="/friends/send" method="post"><input type="hidden" name="receiverId" value="'+u[i].id+'"><button class="btn-xs" style="background:var(--green);color:#d2e885">Add</button></form></div>';
+            }
+            b.innerHTML=h;b.classList.add('show');
+        });
+    },300);
+}
+function showRes(){var b=document.getElementById('res');if(b.children.length)b.classList.add('show');}
+document.addEventListener('click',function(e){if(!e.target.closest('.sbox'))document.getElementById('res').classList.remove('show');});
+function sel(el){
+    document.querySelectorAll('.fitem').forEach(function(i){i.classList.remove('sel');});
+    el.classList.add('sel');
+    document.getElementById('empty').style.display='none';
+    document.getElementById('prof').classList.remove('hidden');
+    var id=el.getAttribute('data-id'), u=el.getAttribute('data-username'), n=el.getAttribute('data-nickname'),
+        e=el.getAttribute('data-email'), a=el.getAttribute('data-avatar'), s=el.getAttribute('data-since');
+    document.getElementById('pn').textContent=n;
+    document.getElementById('pe').textContent=e;
+    document.getElementById('ps').textContent=s?'Member since '+new Date(s).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
+    document.getElementById('pmsg').href='/messages?chat='+id;
+    document.getElementById('pprof').href='/friends/'+id;
+    document.getElementById('prid').value=id;
+    if(a){
+        document.getElementById('pai').src=a;document.getElementById('pai').classList.remove('hidden');document.getElementById('pal').classList.add('hidden');
+    }else{
+        document.getElementById('pai').classList.add('hidden');document.getElementById('pal').classList.remove('hidden');document.getElementById('pal').textContent=u.charAt(0).toUpperCase();
+    }
+    fetch('/friends/profile/'+id).then(function(r){return r.json()}).then(function(p){
+        var d=document.getElementById('pd'), h='<div class="flex gap1 mt1" style="border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">';
+        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">'+(p.gameCount||0)+'</div><div class="fs-xs muted">Games</div></div>';
+        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">$'+(p.totalSpent||0).toFixed(2)+'</div><div class="fs-xs muted">Spent</div></div></div>';
+        d.innerHTML=h;
+    });
+}
+function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+</script></body></html>

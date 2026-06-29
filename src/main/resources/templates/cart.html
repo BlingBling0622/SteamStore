@@ -3,20 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
     <title th:text="#{cart.title} + ' - Steam'">Cart</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
-        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
-        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none;margin-right:1rem}
-        .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
-        .nav-inner a:hover{color:#fff;background:rgba(255,255,255,.1)}
-        .nav-right{margin-left:auto}
-        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
-        .lang-select:focus{outline:none;border-color:#66c0f4}
-        .main{max-width:900px;margin:2rem auto;padding:0 20px;flex:1;width:100%}
+        .main{max-width:1400px;margin:2rem auto;padding:0 20px;flex:1;width:100%}
         .page-title{font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:1.5rem}
         .empty{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;padding:3rem;text-align:center}
         .empty p{color:#8f98a0;font-size:1rem;margin-bottom:1rem}
@@ -35,36 +25,10 @@
         .total-amount{color:#fff;font-size:1.5rem;font-weight:700}
         .btn-checkout{padding:.875rem 2rem;background:linear-gradient(to bottom,#47810a,#3d6b08);color:#acdbf5;font-weight:700;font-size:1rem;border:none;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
         .btn-checkout:hover{background:linear-gradient(to bottom,#56980d,#4a7d0a)}
-        footer{background:#171d25;border-top:1px solid #2a475e;padding:1.5rem;text-align:center;color:#8f98a0;font-size:.8rem;margin-top:auto}
     </style>
 </head>
 <body>
-<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
-    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
-        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
-        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
-        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
-        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
-            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
-            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
-                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
-            </form>
-            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none">Sign In</a>
-            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer">
-                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
-                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
-                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
-                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
-                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
-                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
-                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
-                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
-            </select>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
 <div class="main">
     <div class="page-title" th:text="#{cart.title}">Shopping Cart</div>
 

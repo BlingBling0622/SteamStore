@@ -4,6 +4,8 @@ import com.steamlibrary.model.Product;
 import com.steamlibrary.model.SteamAccount;
 import com.steamlibrary.model.User;
 import com.steamlibrary.repository.SteamAccountRepository;
+import com.steamlibrary.service.FriendService;
+import com.steamlibrary.service.GroupService;
 import com.steamlibrary.service.StoreService;
 import com.steamlibrary.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ public class ProfileController {
 
     private final UserService userService;
     private final StoreService storeService;
+    private final FriendService friendService;
+    private final GroupService groupService;
     private final SteamAccountRepository steamAccountRepository;
 
     @GetMapping("/profile")
@@ -37,6 +41,8 @@ public class ProfileController {
         model.addAttribute("gameCount", purchasedGames.size());
         model.addAttribute("totalSpent", storeService.getTotalSpent(user));
         model.addAttribute("memberSince", user.getCreatedAt());
+        model.addAttribute("friendsCount", friendService.getFriends(user).size());
+        model.addAttribute("groupCount", groupService.getUserGroups(user).size());
 
         Optional<SteamAccount> steamAccount = steamAccountRepository.findByUser(user);
         model.addAttribute("steamAccount", steamAccount.orElse(null));

@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .requestMatchers("/", "/store", "/store/**", "/register", "/login", "/css/**", "/js/**", "/images/**", "/debug/**").permitAll()
                 .requestMatchers("/auth/steam/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/friends/**").authenticated()
+                .requestMatchers("/messages/**").authenticated()
+                .requestMatchers("/groups/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -40,7 +43,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**", "/store/**", "/debug/**", "/dashboard/favorite", "/cart/**", "/checkout")
+                .ignoringRequestMatchers("/h2-console/**", "/store/**", "/debug/**", "/dashboard/favorite", "/cart/**", "/checkout", "/friends/**", "/messages/**", "/groups/**")
             )
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())

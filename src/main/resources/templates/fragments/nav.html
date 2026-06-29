@@ -1,0 +1,35 @@
+<nav class="steam-nav" th:fragment="steam-nav">
+    <div class="nav-inner">
+        <a href="/" class="logo">STEAM<span>STORE</span></a>
+        <a href="/store" class="nav-link">Store</a>
+        <a href="/dashboard" class="nav-link">Library</a>
+        <a href="/friends" class="nav-link">
+            Friends
+            <span th:if="${pendingFriendCount > 0}" class="nav-badge red" th:text="${pendingFriendCount}">0</span>
+        </a>
+        <a href="/messages" class="nav-link">
+            Messages
+            <span th:if="${unreadMessageCount > 0}" class="nav-badge blue" th:text="${unreadMessageCount}">0</span>
+        </a>
+        <a href="/groups" class="nav-link">Groups</a>
+        <a href="/profile" class="nav-link">Profile</a>
+        <div class="nav-right">
+            <a href="/cart" class="nav-link" style="color:#66c0f4">Cart</a>
+            <span sec:authorize="isAuthenticated()" class="username" sec:authentication="name"></span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" class="btn-signout">Sign Out</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" href="/login" class="btn-signin">Sign In</a>
+            <select class="lang-select" onchange="window.location.href='?lang='+this.value">
+                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
+                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
+                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
+                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
+                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
+                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
+                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
+                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
+            </select>
+        </div>
+    </div>
+</nav>

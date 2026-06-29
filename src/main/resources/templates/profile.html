@@ -1,211 +1,70 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${user.username} + ' - Profile'">Profile</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;min-height:100vh}
-
-        /* Nav */
-        nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100}
-        .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem}
-        .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none}
-        .logo span{color:#66c0f4}
-        .nav-inner a{color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px}
-        .nav-inner a:hover,.nav-inner a.active{color:#fff;background:rgba(255,255,255,.1)}
-        .nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-        .btn-logout{padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer}
-        .btn-logout:hover{background:#6d9314}
-        .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem}
-
-        /* Hero Banner */
-        .hero{position:relative;height:420px;background-size:cover;background-position:center 30%;display:flex;align-items:flex-end}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(27,40,56,.95) 0%,rgba(27,40,56,.4) 60%,rgba(27,40,56,.2) 100%)}
-        .hero-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:2rem 20px;width:100%;display:flex;align-items:flex-end;gap:1.5rem}
-        .avatar{width:100px;height:100px;border-radius:50%;border:3px solid #66c0f4;background:#2a475e;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:#66c0f4;flex-shrink:0;overflow:hidden}
-        .avatar img{width:100%;height:100%;object-fit:cover}
-        .hero-info{flex:1}
-        .hero-info h1{font-size:2rem;color:#fff;font-weight:300}
-        .hero-info .email{font-size:.9rem;color:#8f98a0;margin-top:.25rem}
-        .edit-bg-btn{padding:.5rem 1.2rem;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:2px;cursor:pointer;font-size:.85rem;align-self:flex-start;margin-top:.5rem}
-        .edit-bg-btn:hover{background:rgba(103,193,245,.3);border-color:#66c0f4}
-
-        /* Alert */
-        .alert{padding:.75rem 1rem;border-radius:2px;margin-bottom:1rem;font-size:.9rem}
-        .alert-success{background:rgba(74,126,22,.15);border:1px solid #4a7e16;color:#a4d007}
-
-        /* Main */
-        .content{max-width:1200px;margin:2rem auto;padding:0 20px}
-
-        /* Stats */
-        .stats{display:flex;gap:1rem;margin-bottom:2rem}
-        .stat-card{flex:1;background:#16202d;padding:1.25rem;border-radius:4px;border:1px solid #000}
-        .stat-label{font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.35rem}
-        .stat-value{font-size:1.75rem;color:#66c0f4;font-weight:300}
-
-        /* Section */
-        .section{margin-bottom:2rem}
-        .section-title{font-size:1rem;color:#fff;font-weight:600;text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.08)}
-
-        /* Steam card */
-        .steam-card{background:#16202d;border:1px solid #000;border-radius:4px;padding:1.25rem;display:flex;align-items:center;gap:1rem}
-        .steam-card img{width:48px;height:48px;border-radius:4px}
-        .steam-linked{color:#a4d007}
-        .btn-steam{padding:.5rem 1.2rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none;display:inline-block}
-        .btn-steam:hover{background:linear-gradient(to bottom,#316282,#234e6b)}
-
-        /* BG Picker */
-        .bg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:.75rem}
-        .bg-card{background:#16202d;border:2px solid transparent;border-radius:4px;overflow:hidden;cursor:pointer;transition:all .15s}
-        .bg-card:hover,.bg-card.active{border-color:#66c0f4}
-        .bg-card img{width:100%;height:87px;object-fit:cover;display:block}
-        .bg-card .name{padding:.5rem;font-size:.75rem;color:#8f98a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .custom-url{display:flex;gap:.5rem;margin-top:1rem}
-        .custom-url input{flex:1;padding:.5rem .75rem;background:#1b2838;border:1px solid #4b6a88;color:#c6d4df;border-radius:2px;font-size:.9rem}
-        .custom-url input:focus{outline:none;border-color:#66c0f4}
-        .btn-save{padding:.5rem 1.5rem;background:#5c7e10;color:#d2e885;font-weight:700;border:none;border-radius:2px;cursor:pointer;font-size:.85rem}
-        .btn-save:hover{background:#6d9314}
-
-        /* Game Showcase */
-        .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-        .game-card{background:#16202d;border:1px solid #000;border-radius:4px;overflow:hidden;text-decoration:none;color:inherit;display:block;transition:all .2s}
-        .game-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.4);border-color:#66c0f4}
-        .game-card img{width:100%;height:132px;object-fit:cover;display:block}
-        .game-card-body{padding:.75rem}
-        .game-card-body h4{font-size:.9rem;color:#fff;font-weight:400;margin-bottom:.25rem}
-        .game-meta{font-size:.75rem;color:#8f98a0}
-        .game-meta .dev{color:#66c0f4}
-        .tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.4rem}
-        .tag{background:rgba(103,193,245,.2);color:#67c1f5;padding:.15rem .4rem;border-radius:2px;font-size:.7rem}
-
-        .empty{text-align:center;padding:3rem;color:#8f98a0}
-        .empty h3{color:#fff;margin-bottom:.5rem}
-
-        footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.5rem;color:#8f98a0;font-size:.8rem;margin-top:3rem}
-
-        @media(max-width:768px){
-            .hero{height:200px}
-            .hero-content{flex-direction:column;align-items:center;text-align:center}
-            .stats{flex-direction:column}
-            .games-grid{grid-template-columns:1fr}
-        }
-    </style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
+<title th:text="${user.username}+' - Profile'">Profile</title>
+<style>
+.hero{position:relative;height:320px;background-size:cover;background-position:center 20%;display:flex;align-items:flex-end}
+.hero .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(27,40,56,.96) 0%,rgba(27,40,56,.3) 55%,rgba(27,40,56,.1) 100%)}
+.hero .hc{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:1.5rem 20px;width:100%;display:flex;align-items:flex-end;gap:1rem}
+.av-lg{width:90px;height:90px;border-radius:50%;border:3px solid var(--accent);background:var(--border1);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden}
+.av-lg img{width:100%;height:100%;object-fit:cover}
+.hero h1{font-size:1.6rem;color:var(--white);font-weight:300}.hero .sub{font-size:.82rem;color:var(--muted);margin-top:.15rem}
+.content{max-width:1400px;margin:0 auto;padding:0 20px 2rem;flex:1;width:100%}
+.grid2{display:grid;grid-template-columns:1fr 300px;gap:2rem;margin-top:1.5rem}
+</style>
 </head>
 <body>
-<nav style="background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0;position:sticky;top:0;z-index:100">
-    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:1.5rem">
-        <a href="/" style="font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none">STEAM<span style="color:#66c0f4">STORE</span></a>
-        <a href="/store" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Store</a>
-        <a href="/dashboard" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Library</a>
-        <a href="/profile" style="color:#c6d4df;text-decoration:none;font-size:.9rem;padding:.4rem .75rem;border-radius:2px">Profile</a>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:.75rem">
-            <a href="/cart" style="color:#66c0f4;text-decoration:none;font-size:.9rem">Cart</a>
-            <span sec:authorize="isAuthenticated()" style="color:#8f98a0;font-size:.85rem" sec:authentication="name"></span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
-                <button type="submit" style="padding:.4rem 1rem;background:#5c7e10;color:#d2e885;font-size:.85rem;font-weight:700;border:none;border-radius:2px;cursor:pointer">Sign Out</button>
-            </form>
-            <a sec:authorize="!isAuthenticated()" href="/login" style="padding:.4rem 1rem;background:linear-gradient(to bottom,#2a475e,#1b3a4f);color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;cursor:pointer;text-decoration:none">Sign In</a>
-            <select onchange="window.location.href='?lang='+this.value" style="background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer">
-                <option value="en" th:selected="${currentLang == 'en'}">EN</option>
-                <option value="ja" th:selected="${currentLang == 'ja'}">日本語</option>
-                <option value="ko" th:selected="${currentLang == 'ko'}">한국어</option>
-                <option value="fr" th:selected="${currentLang == 'fr'}">FR</option>
-                <option value="de" th:selected="${currentLang == 'de'}">DE</option>
-                <option value="ru" th:selected="${currentLang == 'ru'}">RU</option>
-                <option value="es" th:selected="${currentLang == 'es'}">ES</option>
-                <option value="zh" th:selected="${currentLang == 'zh'}">中文</option>
-            </select>
-        </div>
-    </div>
-</nav>
-
-<!-- Hero Banner -->
-<div class="hero" id="heroBanner" th:style="'background-image:url(' + ${user.profileBackgroundUrl != null ? user.profileBackgroundUrl : 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg'} + ')'">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-        <div class="avatar">
-            <img th:if="${user.avatarUrl != null}" th:src="${user.avatarUrl}" alt="Avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <img th:if="${steamLinked && user.avatarUrl == null}" th:src="${steamAccount.avatarUrl}" alt="Avatar">
-            <span th:if="${user.avatarUrl == null && !steamLinked}" th:text="${#strings.toUpperCase(user.username.substring(0,1))}" style="display:flex"></span>
-        </div>
-        <div class="hero-info">
-            <h1 th:text="${user.nickname != null ? user.nickname : user.username}"></h1>
-            <div class="email" th:text="${user.email}"></div>
-        </div>
-        <a href="/profile/edit" class="edit-bg-btn" style="text-decoration:none">Edit Profile</a>
+<div th:replace="~{fragments/nav :: steam-nav}"></div>
+<div class="hero" th:style="'background-image:url('+${user.profileBackgroundUrl!=null?user.profileBackgroundUrl:'https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg'}+')'">
+    <div class="ov"></div><div class="hc">
+        <div class="av-lg"><img th:if="${user.avatarUrl!=null}" th:src="${user.avatarUrl}" alt="" onerror="this.style.display='none'"><span th:unless="${user.avatarUrl!=null}" th:text="${#strings.toUpperCase(user.username.substring(0,1))}"></span></div>
+        <div class="flex1"><h1 th:text="${user.nickname!=null?user.nickname:user.username}"></h1><div class="sub" th:text="${user.email}"></div><div class="sub">Member since <span class="accent" th:text="${memberSince!=null?#temporals.format(memberSince,'MMMM yyyy'):'--'}"></span></div></div>
+        <a href="/profile/edit" class="btn btn-b">Edit Profile</a>
     </div>
 </div>
-
 <div class="content">
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-
-    <!-- Stats -->
+    <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
     <div class="stats">
-        <div class="stat-card">
-            <div class="stat-label">Games Owned</div>
-            <div class="stat-value" th:text="${gameCount}">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Total Spent</div>
-            <div class="stat-value" th:text="${cSym} + ${#numbers.formatDecimal(totalSpent * cRate, 1, cDec)}"></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Member Since</div>
-            <div class="stat-value" style="font-size:1.25rem" th:text="${memberSince != null ? #temporals.format(memberSince, 'MMMM yyyy') : 'N/A'}"></div>
-        </div>
+        <div class="stat"><div class="v" th:text="${gameCount}">0</div><div class="l">Games</div></div>
+        <div class="stat"><div class="v" th:text="${cSym}+${#numbers.formatDecimal(totalSpent*cRate,1,cDec)}"></div><div class="l">Spent</div></div>
+        <div class="stat"><div class="v" th:text="${friendsCount}">0</div><div class="l">Friends</div></div>
+        <div class="stat"><div class="v" th:text="${groupCount}">0</div><div class="l">Groups</div></div>
+        <div class="stat"><div class="v fs-sm" th:text="${steamLinked?'Linked':'--'}"></div><div class="l">Steam</div></div>
     </div>
-
-    <!-- Steam Link -->
-    <div class="section">
-        <div class="section-title">Steam Account</div>
-        <div class="steam-card" th:if="${steamLinked}">
-            <img th:src="${steamAccount.avatarUrl}" alt="">
-            <div>
-                <div class="steam-linked">✓ Linked as <strong th:text="${steamAccount.personaName}">Name</strong></div>
-                <div style="font-size:.85rem;color:#8f98a0;margin-top:.25rem" th:text="${steamAccount.steamId}"></div>
+    <div class="grid2">
+        <div>
+            <h3 style="font-size:.85rem;color:var(--white);text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.08)">Game Library &middot; <span class="muted" style="font-weight:400" th:text="${gameCount}+' games'"></span></h3>
+            <div th:if="${purchasedGames.isEmpty()}" style="text-align:center;padding:2rem;color:var(--muted)">No games yet. <a href="/store">Browse Store</a></div>
+            <div class="ggrid" th:unless="${purchasedGames.isEmpty()}">
+                <a th:each="p:${purchasedGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="gcard">
+                    <img th:src="${p.headerImageUrl}" th:alt="${p.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
+                    <div class="gbody"><div class="gtitle" th:text="${p.name}"></div><div class="fs-xs muted" th:text="${p.developer}"></div></div>
+                </a>
             </div>
         </div>
-        <div class="steam-card" th:unless="${steamLinked}">
-            <div style="font-size:3rem;margin-right:.5rem">🔗</div>
-            <div>
-                <div style="font-weight:600">Steam Account Not Linked</div>
-                <div style="font-size:.85rem;color:#8f98a0;margin:.25rem 0">Link your Steam account to sync your library</div>
-                <a href="/auth/steam/login" class="btn-steam">Connect Steam Account</a>
+        <div class="flex col gap1">
+            <div class="card"><h3>Steam</h3>
+                <div th:if="${steamLinked}"><div style="color:var(--green2);font-size:.82rem">Linked as <strong th:text="${steamAccount.personaName}"></strong></div></div>
+                <div th:unless="${steamLinked}"><p class="fs-sm muted mb1">Link your Steam account to sync your library</p><a href="/auth/steam/login" class="btn btn-b">Connect Steam</a></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Purchased Games -->
-    <div class="section">
-        <div class="section-title">Your Games</div>
-        <div th:if="${purchasedGames.isEmpty()}" class="empty">
-            <h3>No games purchased yet</h3>
-            <p>Browse the store to start your collection!</p>
-            <a href="/store" class="btn-steam" style="margin-top:1rem">Browse Store</a>
-        </div>
-        <div class="games-grid" th:unless="${purchasedGames.isEmpty()}">
-            <a th:each="p : ${purchasedGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="game-card">
-                <img th:src="${p.screenshot1Url != null ? p.screenshot1Url : p.headerImageUrl}" th:alt="${p.name}"
-                     onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
-                <div class="game-card-body">
-                    <h4 th:text="${p.name}">Game</h4>
-                    <div class="game-meta">
-                        <span class="dev" th:text="${p.developer}"></span> &middot;
-                        <span th:text="${p.reviewSummary}"></span>
-                    </div>
-                    <div class="tags">
-                        <span class="tag" th:each="tag : ${#strings.arraySplit(p.tags, ',')}" th:text="${#strings.trim(tag)}"></span>
-                    </div>
-                </div>
-            </a>
+            <div class="card"><h3>Details</h3>
+                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted">Username</span><span th:text="${user.username}"></span></div>
+                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted">Nickname</span><span th:text="${user.nickname!=null?user.nickname:'--'}"></span></div>
+                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted">Email</span><span th:text="${user.email}" style="font-size:.75rem"></span></div>
+                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted">Joined</span><span th:text="${memberSince!=null?#temporals.format(memberSince,'MMM yyyy'):'--'}"></span></div>
+            </div>
+            <div class="card"><h3>Social</h3>
+                <a href="/friends" class="flex" style="justify-content:space-between;padding:.3rem 0;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04)">
+                    <span>Friends</span><span class="accent" th:text="${friendsCount}">0</span></a>
+                <a href="/groups" class="flex" style="justify-content:space-between;padding:.3rem 0;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04)">
+                    <span>Groups</span><span class="accent" th:text="${groupCount}">0</span></a>
+                <a href="/messages" class="flex" style="justify-content:space-between;padding:.3rem 0;color:var(--text)">
+                    <span>Messages</span></a>
+            </div>
         </div>
     </div>
 </div>
-
-<footer>
-    &copy; 2026 Steam Store &nbsp;·&nbsp; Not affiliated with Valve Corporation
-</footer>
+<footer>&copy; 2026 Steam Store &middot; Not affiliated with Valve Corporation</footer>
 </body>
 </html>
