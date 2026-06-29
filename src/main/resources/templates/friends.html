@@ -32,7 +32,7 @@
 <div id="prof" class="pcard hidden"><div class="hd"><div class="fav av-lg" id="pa"><img id="pai" src="" alt="" class="hidden"><span id="pal"></span></div><div class="flex1"><h2 id="pn"></h2><div class="fs-sm muted" id="pe"></div><div class="fs-xs muted" id="ps"></div></div></div>
 <div id="pd" class="mb1"></div><div class="flex gap1"><a id="pmsg" href="#" class="btn btn-g">Send Message</a><a id="pprof" href="#" class="btn btn-b">View Profile</a><form id="prem" th:action="@{/friends/remove}" method="post" style="display:inline" onsubmit="return confirm('Remove?')"><input type="hidden" name="friendId" id="prid"><button class="btn btn-r">Remove</button></form></div></div>
 </main></div>
-<footer>&copy; 2026 Steam Store &middot; Not affiliated with Valve Corporation</footer>
+<footer><span th:text="#{footer.copy}"></span>  <span th:text="#{footer.disclaimer}"></span></footer>
 <script>
 var tmr;
 function doSearch(){

@@ -2,9 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/css/steam.css">
-<link rel="stylesheet" href="/css/steam-nav.css">
-<title>Store - Steam</title>
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
+<title th:text="#{nav.store} + ' - Steam'">Store - Steam</title>
 <style>.bar{background:var(--bg2);padding:.5rem .7rem;margin-bottom:1rem;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
 .bar .b{padding:.3rem .6rem;background:var(--border1);color:var(--text);border:1px solid var(--border2);border-radius:2px;font-size:.78rem;cursor:pointer}
 .bar .b.on,.bar .b:hover{background:var(--accent);color:var(--white);border-color:var(--accent)}
@@ -12,31 +11,35 @@
 </head>
 <body>
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
-
 <div class="wrap flex">
     <aside class="side">
-        <h3>Browse</h3><a href="/store" class="on">All Games</a><a href="#" onclick="filt('free',event,this)">Free to Play</a>
+        <h3 th:text="#{store.browse}">Browse</h3>
+        <a href="/store" class="on" th:text="#{store.allgames}">All Games</a>
+        <a href="#" onclick="filt('free',event,this)" th:text="#{store.free}">Free to Play</a>
         <h3>Genres</h3>
-        <a href="#" onclick="filt('action',event,this)">Action</a><a href="#" onclick="filt('rpg',event,this)">RPG</a>
-        <a href="#" onclick="filt('strategy',event,this)">Strategy</a><a href="#" onclick="filt('adventure',event,this)">Adventure</a>
-        <a href="#" onclick="filt('simulation',event,this)">Simulation</a><a href="#" onclick="filt('indie',event,this)">Indie</a>
+        <a href="#" onclick="filt('action',event,this)">Action</a>
+        <a href="#" onclick="filt('rpg',event,this)">RPG</a>
+        <a href="#" onclick="filt('strategy',event,this)">Strategy</a>
+        <a href="#" onclick="filt('adventure',event,this)">Adventure</a>
+        <a href="#" onclick="filt('simulation',event,this)">Simulation</a>
+        <a href="#" onclick="filt('indie',event,this)">Indie</a>
     </aside>
     <div class="flex1 p2">
-        <div class="fs-sm muted mb1"><a href="/">Home</a> &rsaquo; Store</div>
-        <h1 style="font-size:1.5rem;color:var(--white);font-weight:300;margin-bottom:.2rem">Browse Games</h1>
-        <p class="muted fs-sm mb1" th:text="${products.size()} + ' games'"></p>
+        <div class="fs-sm muted mb1"><a href="/">Home</a> &rsaquo; <span th:text="#{nav.store}">Store</span></div>
+        <h1 style="font-size:1.5rem;color:var(--white);font-weight:300;margin-bottom:.2rem" th:text="#{store.allgames}">Browse Games</h1>
+        <p class="muted fs-sm mb1"><span th:text="${products.size()}"></span> <span th:text="#{store.games}">games</span></p>
         <div class="bar">
-            <button class="b on" onclick="filt('all',event,this)">All</button>
+            <button class="b on" onclick="filt('all',event,this)" th:text="#{store.allgames}">All</button>
             <button class="b" onclick="filt('action',event,this)">Action</button>
             <button class="b" onclick="filt('rpg',event,this)">RPG</button>
             <button class="b" onclick="filt('strategy',event,this)">Strategy</button>
             <button class="b" onclick="filt('indie',event,this)">Indie</button>
-            <input type="text" placeholder="Search..." id="q" onkeyup="search()">
+            <input type="text" th:placeholder="#{store.search}" id="q" onkeyup="search()">
         </div>
         <div class="ggrid" id="grid">
             <a th:each="p : ${products}" th:href="@{/store/game/{id}(id=${p.id})}" class="gcard"
                th:data-tags="${p.tags!=null?#strings.toLowerCase(p.tags):''}" th:data-name="${#strings.toLowerCase(p.name)}" th:data-free="${p.price==0}">
-                <div th:if="${ownedIds!=null&&ownedIds.contains(p.id)}" class="gown">In Library</div>
+                <div th:if="${ownedIds!=null&&ownedIds.contains(p.id)}" class="gown" th:text="#{game.owned}">In Library</div>
                 <img th:src="${p.headerImageUrl}" th:alt="${p.name}"
                      onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
                 <div class="gbody">
@@ -46,7 +49,7 @@
                     <div class="flex gap2" style="align-items:center">
                         <span th:if="${p.discountPercent>0}" class="gdisc" th:text="'-'+${p.discountPercent}+'%'"></span>
                         <span th:if="${p.discountPercent>0}" class="gold" th:text="${cSym}+${#numbers.formatDecimal(p.price*cRate,1,cDec)}"></span>
-                        <span th:if="${p.price==0}" class="gfree">Free</span>
+                        <span th:if="${p.price==0}" class="gfree" th:text="#{store.free}">Free</span>
                         <span th:if="${p.price>0}" class="gcur" th:text="${cSym}+${#numbers.formatDecimal(p.price*(1-p.discountPercent/100.0)*cRate,1,cDec)}"></span>
                     </div>
                 </div>
@@ -54,7 +57,7 @@
         </div>
     </div>
 </div>
-<footer>&copy; 2026 Steam Store &middot; Not affiliated with Valve Corporation</footer>
+<footer><span th:text="#{footer.copy}"></span> &middot; <span th:text="#{footer.disclaimer}"></span></footer>
 <script>
 var cur='all';
 function search(){var q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('.gcard').forEach(function(r){r.style.display=(r.getAttribute('data-name')||'').includes(q)?'':'none';});}
