@@ -42,6 +42,7 @@ public class FriendController {
             fm.put("avatarUrl", f.getAvatarUrl() != null ? f.getAvatarUrl() : "");
             fm.put("email", f.getEmail());
             fm.put("since", f.getCreatedAt() != null ? f.getCreatedAt().toString() : "");
+            fm.put("updatedAt", f.getUpdatedAt() != null ? f.getUpdatedAt().toString() : "");
             friendViews.add(fm);
         }
 

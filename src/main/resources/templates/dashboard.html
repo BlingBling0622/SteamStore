@@ -17,18 +17,18 @@
         <h3>Library</h3>
         <a href="#" class="on" data-filter="all">All Games <span class="badge" th:text="${gameCount}">0</span></a>
         <a href="#" data-filter="favorites">Favorites <span class="badge" id="favBadge">0</span></a>
-<h3>Collections</h3><a th:each="tag:${allTags}" href="#" th:attr="data-tag=${tag}"><span th:text="${tag}"></span></a>
+<h3 th:text="Collections">Collections</h3><a th:each="tag:${allTags}" href="#" th:attr="data-tag=${tag}"><span th:text="${#messages.msgOrNull('tag.' + tag) ?: tag}"></span></a>
     </aside>
     <div class="main flex1">
         <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
         <div class="stats">
-            <div class="stat"><div class="v" th:text="${gameCount}">0</div><div class="l">Games</div></div>
-            <div class="stat"><div class="v" th:text="${cSym}+${#numbers.formatDecimal(totalSpent*cRate,1,cDec)}"></div><div class="l">Spent</div></div>
-            <div class="stat"><div class="v" id="favCount">0</div><div class="l">Favorites</div></div>
+            <div class="stat"><div class="v" th:text="${gameCount}">0</div><div class="l" th:text="#{dashboard.games}">Games</div></div>
+            <div class="stat"><div class="v" th:text="${cSym}+${#numbers.formatDecimal(totalSpent*cRate,1,cDec)}"></div><div class="l" th:text="#{dashboard.spent}">Spent</div></div>
+            <div class="stat"><div class="v" id="favCount">0</div><div class="l"th:text="#{dashboard.favorites}">Favorites</div></div>
         </div>
-        <input type="text" placeholder="Search your library..." id="s" style="max-width:350px;margin-bottom:1rem" oninput="doSearch()">
-        <div th:if="${purchasedGames.isEmpty()}" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)">Your library is empty</h3><p>Browse the store to start your collection</p><a href="/store" class="btn btn-g mt1">Browse Store</a></div>
-        <div id="noRes" class="hidden" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)">No games found</h3><p>Try a different filter</p></div>
+        <input type="text" th:placeholder="#{dashboard.searchlib}" id="s" style="max-width:350px;margin-bottom:1rem" oninput="applyAll()">
+        <div th:if="${purchasedGames.isEmpty()}" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)" th:text="#{dashboard.empty}">Your library is empty</h3><p th:text="#{dashboard.emptydesc}">Browse the store to start your collection</p><a href="/store" class="btn btn-g mt1" th:text="#{dashboard.browse}">Browse Store</a></div>
+        <div id="noRes" class="hidden" style="text-align:center;padding:3rem;color:var(--muted)"><h3 style="color:var(--white)"th:text="#{dashboard.noresults}">No games found</h3><p th:text="#{dashboard.noresultsdesc}">Try a different filter</p></div>
         <div class="ggrid" id="grid" th:unless="${purchasedGames.isEmpty()}">
             <a th:each="p:${purchasedGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="gcard"
                th:attr="data-name=${#strings.toLowerCase(p.name)},data-tags=${p.tags!=null?#strings.toLowerCase(p.tags):''},data-id=${p.id}">
@@ -44,28 +44,33 @@
 var cur='all';
 function toggleFav(b,e){e.stopPropagation();e.preventDefault();var id=b.getAttribute('data-id');
 fetch('/dashboard/favorite',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'productId='+id}).then(function(r){return r.json()}).then(function(d){
-b.classList.toggle('on',d.added);if(d.added){b.innerHTML='&#9829;'}else{b.innerHTML='&#9825;'}updateFav(d.count);if(cur==='favorites')apply();});}
+b.classList.toggle('on',d.added);if(d.added){b.innerHTML='&#9829;'}else{b.innerHTML='&#9825;'}updateFav(d.count);if(cur==='favorites')applyAll();});}
 function updateFav(n){document.getElementById('favCount').textContent=n;var b=document.getElementById('favBadge');if(b)b.textContent=n;}
-function apply(){
-    var cards=document.querySelectorAll('#grid .gcard'),vis=0;
-    cards.forEach(function(c){var on=c.querySelector('.favbtn.on');
-        if(cur==='all'){c.classList.remove('hidden');vis++;}
-        else if(cur==='favorites'){if(on){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');}
-        else{var t=c.getAttribute('data-tags')||'';if(t.includes(cur.toLowerCase())){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');}
-    });
-    var q=document.getElementById('s').value.trim().toLowerCase();if(q)doSearch();
-    document.getElementById('noRes').style.display=vis===0?'block':'none';
+function fuzzyMatch(name, query) {
+    var ni=0, qi=0, n=name.length, q=query.length;
+    while(ni<n&&qi<q){if(name[ni]===query[qi])qi++;ni++;}
+    return qi===q;
 }
-function doSearch(){
-    var q=document.getElementById('s').value.trim().toLowerCase(),vis=0;
-    document.querySelectorAll('#grid .gcard').forEach(function(c){if(c.classList.contains('hidden'))return;var n=c.getAttribute('data-name')||'';if(!q||n.includes(q)){c.classList.remove('hidden');vis++;}else c.classList.add('hidden');});
-    document.getElementById('noRes').style.display=vis===0?'block':'none';
+function applyAll(){
+    var q=document.getElementById("s").value.trim().toLowerCase(),vis=0;
+    document.querySelectorAll("#grid .gcard").forEach(function(c){
+        var on=c.querySelector(".favbtn.on");
+        var matchCat=false;
+        if(cur==="all")matchCat=true;
+        else if(cur==="favorites")matchCat=!!on;
+        else{var t=c.getAttribute("data-tags")||"";matchCat=t.includes(cur.toLowerCase());}
+        var n=c.getAttribute("data-name")||"";
+        var matchSearch=!q||fuzzyMatch(n,q);
+        if(matchCat&&matchSearch){c.classList.remove("hidden");vis++;}
+        else c.classList.add("hidden");
+    });
+    document.getElementById("noRes").style.display=vis===0?"block":"none";
 }
 (function(){
-    document.querySelectorAll('.sbar a[data-filter],.sbar a[data-tag]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();
-        document.querySelectorAll('.sbar a').forEach(function(x){x.classList.remove('on')});a.classList.add('on');
-        cur=a.getAttribute('data-filter')||a.getAttribute('data-tag')||'all';apply();});});
-    updateFav(document.querySelectorAll('#grid .favbtn.on').length);
+    document.querySelectorAll(".sbar a[data-filter],.sbar a[data-tag]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();
+        document.querySelectorAll(".sbar a").forEach(function(x){x.classList.remove("on")});a.classList.add("on");
+        cur=a.getAttribute("data-filter")||a.getAttribute("data-tag")||"all";applyAll();});});
+    updateFav(document.querySelectorAll("#grid .favbtn.on").length);
 })();
 </script>
 </body>

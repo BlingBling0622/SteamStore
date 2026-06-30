@@ -77,11 +77,17 @@ textarea{resize:none}
 
 /* === Game Grid === */
 .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
-.gcard{background:var(--bg2);border-radius:4px;overflow:hidden;text-decoration:none;color:inherit;display:block;position:relative;transition:.15s}
-.gcard:hover{transform:translateY(-2px);border:1px solid var(--accent)}
+.gcard{background:var(--bg2);border-radius:4px;overflow:hidden;text-decoration:none;color:inherit;display:block;position:relative;transition:transform .15s;border:1px solid transparent}
+.gcard:hover{transform:translateY(-2px);border-color:var(--accent);z-index:1}
 .gcard img{width:100%;height:140px;object-fit:cover;display:block}
 .gcard .gbody{padding:.7rem .8rem}
 .gcard .gtitle{font-size:.9rem;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.3rem}
+.gcard .gtags{display:flex;flex-wrap:wrap;gap:.2rem;margin-bottom:.3rem}
+.gcard .gtags span{background:rgba(103,193,245,.15);color:#67c1f5;padding:.1rem .35rem;border-radius:2px;font-size:.65rem}
+.gcard .grev{font-size:.78rem;margin-bottom:.3rem}
+.gcard .grev.rev-green{color:#a4d007}
+.gcard .grev.rev-yellow{color:#c8a820}
+.gcard .grev.rev-red{color:#f44}
 
 /* === Friend list === */
 .flist{display:flex;flex-direction:column;gap:2px}

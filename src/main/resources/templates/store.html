@@ -44,8 +44,8 @@
                      onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
                 <div class="gbody">
                     <div class="gtitle" th:text="${p.name}"></div>
-                    <div class="gtags"><span th:each="t:${#strings.arraySplit(p.tags!=null?p.tags:'',',')}" th:text="${#strings.trim(t)}"></span></div>
-                    <div th:if="${p.reviewSummary!=null}" class="grev" th:text="${p.reviewSummary}"></div>
+                    <div class="gtags"><span th:each="t:${#strings.arraySplit(p.tags!=null?p.tags:'',',')}" th:text="${#messages.msgOrNull('tag.' + #strings.trim(t)) ?: #strings.trim(t)}"></span></div>
+                    <div th:if="${p.reviewSummary!=null}" class="grev" th:text="${p.reviewSummary}" th:classappend="${#strings.contains(p.reviewSummary,'Negative')?'rev-red':(#strings.contains(p.reviewSummary,'Mixed')?'rev-yellow':(#strings.contains(p.reviewSummary,'Positive')?'rev-green':''))}"></div>
                     <div class="flex gap2" style="align-items:center">
                         <span th:if="${p.discountPercent>0}" class="gdisc" th:text="'-'+${p.discountPercent}+'%'"></span>
                         <span th:if="${p.discountPercent>0}" class="gold" th:text="${cSym}+${#numbers.formatDecimal(p.price*cRate,1,cDec)}"></span>
@@ -60,7 +60,8 @@
 <footer><span th:text="#{footer.copy}"></span> &middot; <span th:text="#{footer.disclaimer}"></span></footer>
 <script>
 var cur='all';
-function search(){var q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('.gcard').forEach(function(r){r.style.display=(r.getAttribute('data-name')||'').includes(q)?'':'none';});}
+function fm(n,q){var ni=0,qi=0;while(ni<n.length&&qi<q.length){if(n[ni]===q[qi])qi++;ni++;}return qi===q.length;}
+function search(){var q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('.gcard').forEach(function(r){r.style.display=(!q||fm(r.getAttribute('data-name')||'',q))?'':'none';});}
 function filt(g,evt,el){
     cur=g;document.querySelectorAll('.bar .b').forEach(function(b){b.classList.remove('on')});document.querySelectorAll('.side a').forEach(function(a){a.classList.remove('on')});if(el)el.classList.add('on');
     document.querySelectorAll('.gcard').forEach(function(r){if(g==='all')r.style.display='';else if(g==='free')r.style.display=r.getAttribute('data-free')==='true'?'':'none';else r.style.display=(r.getAttribute('data-tags')||'').includes(g)?'':'none';});
