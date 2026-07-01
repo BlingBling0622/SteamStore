@@ -100,9 +100,14 @@ public class SteamReviewService {
                 + "&filter=" + safeFilter
                 + "&review_type=" + safeReviewType
                 + "&purchase_type=all"
+                // day_range=Long.MAX_VALUE = all-time. The Steam store sends this exact
+                // value; without it Steam defaults to a short window (≈30 days) and only
+                // returns recent reviews that haven't accumulated many helpful votes —
+                // which is why "most helpful" reviews showed tiny upvote counts.
+                + "&day_range=9223372036854775807"
                 + "&num_per_page=" + count
                 + "&cursor=" + URLEncoder.encode(safeCursor, StandardCharsets.UTF_8);
-        log.info("Steam reviews request: app={} filter={} type={} cursor={}", appId, safeFilter, safeReviewType, safeCursor);
+        log.info("Steam reviews request: app={} filter={} type={} day_range=all cursor={}", appId, safeFilter, safeReviewType, safeCursor);
 
         try {
             HttpRequest req = HttpRequest.newBuilder()

@@ -254,7 +254,8 @@
             <div id="reviews-summary"></div>
             <div class="reviews-toolbar">
                 <div class="seg" id="reviews-filter-seg" role="tablist" aria-label="排序方式">
-                    <button type="button" data-filter="recent" class="on">最新</button>
+                    <button type="button" data-filter="all" class="on">最有价值</button>
+                    <button type="button" data-filter="recent">最新</button>
                     <button type="button" data-filter="updated">最近更新</button>
                 </div>
                 <div class="seg" id="reviews-type-seg" role="tablist" aria-label="评价类型">
@@ -368,7 +369,7 @@
 <script>
 (function(){
     var gameId = document.getElementById('reviews-section').getAttribute('data-game-id') || '0';
-    var state = { filter:'recent', type:'all', lang:'all', cursor:'*', loading:false, hasMore:true, totalLoaded:0 };
+    var state = { filter:'all', type:'all', lang:'all', cursor:'*', loading:false, hasMore:true, totalLoaded:0 };
 
     var loadingEl = document.getElementById('reviews-loading');
     var errorEl   = document.getElementById('reviews-error');
@@ -483,8 +484,19 @@
                 return;
             }
 
+            // "最有价值" (Most Helpful): rank this page's reviews by helpful votes
+            // high→low. Steam's filter=all already returns a helpfulness-weighted
+            // set, but re-sorting client-side guarantees a strict ordering within
+            // each page (helpful desc, funny desc as tiebreaker).
+            if(effectiveFilter === 'all'){
+                reviews = reviews.slice().sort(function(a,b){
+                    var diff = (b.helpful||0) - (a.helpful||0);
+                    return diff !== 0 ? diff : (b.funny||0) - (a.funny||0);
+                });
+            }
+
             state.loading = false;
-            loadingEl.classList.add('hidden');
+            loadingEl.classList.remove('hidden');
             if(!append) container.classList.remove('hidden');
             renderSummary(d.summary || {});
             renderReviews(reviews, append);
