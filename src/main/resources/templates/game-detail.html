@@ -25,7 +25,7 @@
         .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem}
 
         /* Hero */
-        .hero{background:linear-gradient(to bottom,rgba(0,0,0,0),#1b2838);padding:1.5rem 0 2rem}
+        .hero{background:linear-gradient(to bottom,rgba(27,40,56,.1),rgba(27,40,56,.25));padding:1.5rem 0 2rem}
         .hero-inner{max-width:1200px;margin:0 auto;padding:0 20px}
         .breadcrumbs{font-size:.85rem;color:#8f98a0;margin-bottom:1rem}
         .breadcrumbs a{color:#66c0f4;text-decoration:none}
@@ -64,7 +64,7 @@
 
         /* Content Area */
         .content-area{max-width:1200px;margin:2rem auto;padding:0 20px}
-        section{background:#16202d;border-radius:4px;padding:1.5rem;margin-bottom:2rem}
+        section{background:rgba(22,32,45,.3);border-radius:4px;padding:1.5rem;margin-bottom:2rem}
         section h2{font-size:1.25rem;color:#fff;font-weight:600;margin-bottom:1rem;text-transform:uppercase}
         .about-content{line-height:1.8;color:#c6d4df}
         .sys-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
@@ -73,7 +73,7 @@
         .sys-col li{margin-bottom:.75rem;font-size:.85rem}
         .sys-col li strong{color:#acdbf5}
 
-        footer{background:#171d25;border-top:1px solid #2a475e;text-align:center;padding:1.2rem;color:#8f98a0;font-size:.75rem;margin-top:auto}
+        footer{background:rgba(23,29,37,.5);border-top:1px solid #2a475e;text-align:center;padding:1.2rem;color:#8f98a0;font-size:.75rem;margin-top:auto}
 #reviews-section{margin-bottom:2rem}
 #reviews-section h2{font-size:1.1rem;color:#fff;font-weight:600;text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.08)}
 /* Summary header */
@@ -126,9 +126,21 @@
             .hero-layout{grid-template-columns:1fr}
             .sys-grid{grid-template-columns:1fr}
         }
+
+        /* Ambient game screenshot background — very subtle, sits behind all content
+           (z-index:-1 paints above body's #1b2838 background but below normal flow).
+           Built as a dark veil gradient layered over the screenshot so the page has
+           ONE uniform dark+photo base — gaps between sections no longer show a
+           lighter band. inset:-20px + blur(8px) softens edges so no hard border
+           shows through. Veil alpha (.88) controls how faint the screenshot is. */
+        .game-bg{position:fixed;inset:-20px;z-index:-1;background-size:cover;background-position:center;background-repeat:no-repeat;filter:blur(8px)}
     </style>
 </head>
 <body>
+<!-- Ambient screenshot background (uses the first screenshot already on the page).
+     A dark gradient is layered over the screenshot so the whole page shares one
+     uniform dark+photo base — no lighter bands in the gaps between sections. -->
+<div class="game-bg" th:if="${product.screenshot1Url != null}" th:style="'background-image:linear-gradient(rgba(20,30,42,.88),rgba(20,30,42,.88)),url(\'' + ${product.screenshot1Url} + '\')'"></div>
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
 
 <div class="hero">
@@ -496,7 +508,7 @@
             }
 
             state.loading = false;
-            loadingEl.classList.remove('hidden');
+            loadingEl.classList.add('hidden');
             if(!append) container.classList.remove('hidden');
             renderSummary(d.summary || {});
             renderReviews(reviews, append);
