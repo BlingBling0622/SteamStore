@@ -3,7 +3,10 @@ package com.steamlibrary.controller;
 import com.steamlibrary.model.Order;
 import com.steamlibrary.model.Product;
 import com.steamlibrary.model.User;
+import java.util.Map;
+import java.util.List;
 import com.steamlibrary.repository.ProductRepository;
+import com.steamlibrary.service.SteamReviewService;
 import com.steamlibrary.service.StoreService;
 import com.steamlibrary.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class StoreController {
     private final StoreService storeService;
     private final UserService userService;
     private final ProductRepository productRepository;
+    private final SteamReviewService steamReviewService;
 
     @GetMapping("/store")
     public String store(@RequestParam(required = false) String q, Model model, Authentication auth) {
@@ -43,6 +47,10 @@ public class StoreController {
         Product product = storeService.getProduct(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         model.addAttribute("product", product);
+
+        // Steam app id (used by the live-reviews widget + "View on Steam" link)
+        String appId = extractAppId(product.getHeaderImageUrl());
+        if (appId != null) model.addAttribute("appId", appId);
 
         // DLCs for this game
         if (product.getIsDlc() != null && !product.getIsDlc()) {
@@ -100,5 +108,31 @@ public class StoreController {
         Order order = storeService.checkout(user);
         model.addAttribute("order", order);
         return "checkout-success";
+    }
+
+    @GetMapping("/store/game/{id}/reviews")
+    @ResponseBody
+    public Map<String, Object> gameReviews(@PathVariable Long id,
+                                           @RequestParam(defaultValue = "10") int count,
+                                           @RequestParam(defaultValue = "recent") String filter,
+                                           @RequestParam(defaultValue = "all") String reviewType,
+                                           @RequestParam(defaultValue = "all") String language,
+                                           @RequestParam(required = false) String cursor) {
+        Product product = storeService.getProduct(id).orElse(null);
+        if (product == null) return Map.of("reviews", List.of(), "total", 0);
+        String appId = extractAppId(product.getHeaderImageUrl());
+        if (appId == null) return Map.of("reviews", List.of(), "total", 0);
+        try {
+            return steamReviewService.fetchReviews(
+                    Integer.parseInt(appId), count, filter, reviewType, language, cursor);
+        } catch (NumberFormatException e) {
+            return Map.of("reviews", List.of(), "total", 0);
+        }
+    }
+
+    private String extractAppId(String imgUrl) {
+        if (imgUrl == null) return null;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("/apps/(\\d+)/").matcher(imgUrl);
+        return m.find() ? m.group(1) : null;
     }
 }
