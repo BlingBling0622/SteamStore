@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
+    <title>编辑个人资料</title>
     <link rel="stylesheet" href="/css/steam-nav.css">
 <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
 
@@ -47,20 +47,20 @@
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
 
 <div class="content">
-    <a href="/profile" class="btn-back">Back to Profile</a>
+    <a href="/profile" class="btn-back">返回个人资料</a>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
     <!-- Nickname -->
     <div class="card">
-        <h2> Nickname</h2>
+        <h2> 昵称</h2>
         <form th:action="@{/profile/edit}" method="post">
             <div class="row">
                 <div>
                     <input type="text" name="nickname" th:value="${user.nickname}" th:placeholder="${user.username}">
                 </div>
                 <div class="small">
-                    <button type="submit" class="btn btn-green" style="width:100%">Save</button>
+                    <button type="submit" class="btn btn-green" style="width:100%">保存</button>
                 </div>
             </div>
         </form>
@@ -68,27 +68,27 @@
 
     <!-- Avatar: URL + Upload integrated -->
     <div class="card">
-        <h2> Avatar</h2>
+        <h2> 头像</h2>
         <div class="row" style="align-items:center;margin-bottom:.75rem">
             <img class="preview-box" th:src="${user.avatarUrl != null ? user.avatarUrl : 'https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'}" id="avatarPreview" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">
-            <span style="font-size:.8rem;color:#8f98a0">Current avatar</span>
+            <span style="font-size:.8rem;color:#8f98a0">当前头像</span>
             <form th:if="${user.avatarUrl != null}" th:action="@{/profile/clear-avatar}" method="post" style="margin-left:auto">
-                <button type="submit" class="btn btn-blue" style="font-size:.75rem;padding:.3rem .8rem">Remove</button>
+                <button type="submit" class="btn btn-blue" style="font-size:.75rem;padding:.3rem .8rem">移除</button>
             </form>
         </div>
         <div class="row">
             <div>
-                <label>Avatar URL</label>
+                <label>头像 URL</label>
                 <form th:action="@{/profile/edit}" method="post" style="display:flex;gap:.5rem">
                     <input type="url" name="avatarUrl" th:value="${user.avatarUrl}" placeholder="https://..." style="flex:1">
-                    <button type="submit" class="btn btn-green">Save URL</button>
+                    <button type="submit" class="btn btn-green">保存 URL</button>
                 </form>
             </div>
             <div class="small">
-                <label>Or upload</label>
+                <label>或上传</label>
                 <form th:action="@{/profile/upload-avatar}" method="post" enctype="multipart/form-data">
                     <input type="file" name="file" accept="image/*" style="margin-bottom:.3rem">
-                    <button type="submit" class="btn btn-blue" style="width:100%">Upload Image</button>
+                    <button type="submit" class="btn btn-blue" style="width:100%">上传图片</button>
                 </form>
             </div>
         </div>
@@ -96,33 +96,33 @@
 
     <!-- Background: URL + Upload + Purchased Games -->
     <div class="card">
-        <h2> Profile Background</h2>
+        <h2> 个人资料背景</h2>
         <div class="row" style="align-items:center;margin-bottom:.75rem">
             <img class="preview-bg" id="bgPreview" th:src="${user.profileBackgroundUrl}" th:if="${user.profileBackgroundUrl != null}" onerror="this.style.display='none'" style="width:100%;height:60px;border-radius:4px;object-fit:cover;background:#1b2838;flex:1">
-            <span th:unless="${user.profileBackgroundUrl != null}" style="font-size:.8rem;color:#8f98a0">No background set</span>
+            <span th:unless="${user.profileBackgroundUrl != null}" style="font-size:.8rem;color:#8f98a0">未设置背景</span>
             <form th:if="${user.profileBackgroundUrl != null}" th:action="@{/profile/clear-background}" method="post" style="margin-left:auto">
-                <button type="submit" class="btn btn-blue" style="font-size:.75rem;padding:.3rem .8rem">Remove</button>
+                <button type="submit" class="btn btn-blue" style="font-size:.75rem;padding:.3rem .8rem">移除</button>
             </form>
         </div>
         <div class="row" style="margin-top:.75rem">
             <div>
-                <label>Background URL</label>
+                <label>背景 URL</label>
                 <form th:action="@{/profile/edit}" method="post" style="display:flex;gap:.5rem">
                     <input type="url" name="backgroundUrl" id="bgUrlInput" th:value="${user.profileBackgroundUrl}" placeholder="https://..." style="flex:1">
-                    <button type="submit" class="btn btn-green">Save URL</button>
+                    <button type="submit" class="btn btn-green">保存 URL</button>
                 </form>
             </div>
             <div class="small">
-                <label>Or upload</label>
+                <label>或上传</label>
                 <form th:action="@{/profile/upload-background}" method="post" enctype="multipart/form-data">
                     <input type="file" name="file" accept="image/*" style="margin-bottom:.3rem">
-                    <button type="submit" class="btn btn-blue" style="width:100%">Upload Image</button>
+                    <button type="submit" class="btn btn-blue" style="width:100%">上传图片</button>
                 </form>
             </div>
         </div>
 
         <!-- Purchased game backgrounds -->
-        <label style="margin-top:1rem">Your Games</label>
+        <label style="margin-top:1rem">你的游戏</label>
         <div class="preset-grid" th:if="${!purchasedScreenshots.isEmpty()}">
             <form th:action="@{/profile/background}" method="post" class="preset-card" th:each="bg : ${purchasedScreenshots}">
                 <input type="hidden" name="backgroundUrl" th:value="${bg}">
@@ -131,10 +131,10 @@
                 </button>
             </form>
         </div>
-        <p th:if="${purchasedScreenshots.isEmpty()}" style="font-size:.85rem;color:#8f98a0;margin-top:.5rem">Purchase games from the store to unlock background options.</p>
+        <p th:if="${purchasedScreenshots.isEmpty()}" style="font-size:.85rem;color:#8f98a0;margin-top:.5rem">从商店购买游戏可解锁更多背景选项。</p>
     </div>
 </div>
 
-<footer>&copy; 2026 Steam Store &nbsp;·&nbsp; Not affiliated with Valve Corporation</footer>
+<footer><span th:text="#{footer.copy}"></span> &nbsp;·&nbsp; <span th:text="#{footer.disclaimer}"></span></footer>
 </body>
 </html>

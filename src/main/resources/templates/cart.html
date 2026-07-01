@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@
                 <img th:src="${item.product.headerImageUrl}" th:alt="${item.product.name}">
                 <div>
                     <a th:href="@{/store/game/{id}(id=${item.product.id})}" class="item-name" th:text="${item.product.name}"></a>
-                    <div th:if="${ownedIds != null and ownedIds.contains(item.product.id)}" style="font-size:.75rem;color:#a4d007;margin-top:.15rem">Already in your library — can still purchase as gift</div>
+                    <div th:if="${ownedIds != null and ownedIds.contains(item.product.id)}" style="font-size:.75rem;color:#a4d007;margin-top:.15rem">已在库中 — 仍可作为礼物购买</div>
                 </div>
                 <div class="item-price">
                     <span th:if="${item.product.price == 0}" th:text="#{store.free}">Free</span>
@@ -56,7 +56,7 @@
                 </form>
             </div>
         </div>
-        <a href="#" onclick="if(document.referrer) { history.back(); } else { location.href='/store'; }; return false;" style="display:inline-block;padding:.6rem 1.2rem;background:#2a475e;color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none;margin-top:1rem">← Continue Shopping</a>
+        <a href="#" onclick="if(document.referrer) { history.back(); } else { location.href='/store'; }; return false;" style="display:inline-block;padding:.6rem 1.2rem;background:#2a475e;color:#66c0f4;font-size:.85rem;font-weight:700;border:1px solid #4b6a88;border-radius:2px;text-decoration:none;margin-top:1rem">← 继续购物</a>
         <div class="checkout-row">
             <div>
                 <div class="total-label" th:text="#{cart.total}">Estimated total</div>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
     <link rel="stylesheet" href="/css/steam-nav.css">
-    <title th:text="${friendNickname} + ' - Steam'">Friend Profile</title>
+    <title th:text="${friendNickname} + ' - Steam'">好友个人资料</title>
     <style>
         body{display:flex;flex-direction:column;min-height:100vh}
 
@@ -74,27 +74,27 @@
         <div class="hero-info">
             <h1 th:text="${friendNickname}"></h1>
             <div class="sub" th:text="${friendEmail}"></div>
-            <div class="sub">Member since <span th:text="${friendSince != null ? #temporals.format(friendSince, 'MMMM yyyy') : '--'}"></span></div>
+            <div class="sub">注册时间 <span th:text="${friendSince != null ? #temporals.format(friendSince, 'yyyy 年 MM 月') : '--'}"></span></div>
         </div>
         <div class="hero-actions">
-            <a th:href="@{/messages?chat={id}(id=${friend.id})}" class="btn-action btn-msg">Send Message</a>
+            <a th:href="@{/messages?chat={id}(id=${friend.id})}" class="btn-action btn-msg">发送消息</a>
         </div>
     </div>
 </div>
 
 <div class="content">
-    <a href="/friends" class="back-link">&larr; Back to Friends</a>
+    <a href="/friends" class="back-link">&larr; 返回好友</a>
 
     <div class="stats">
-        <div class="stat-card"><div class="val" th:text="${friendGameCount}">0</div><div class="lbl">Games</div></div>
-        <div class="stat-card"><div class="val" th:text="${cSym} + ${#numbers.formatDecimal(friendTotalSpent * cRate, 1, cDec)}"></div><div class="lbl">Total Spent</div></div>
-        <div class="stat-card"><div class="val" th:text="${friendCount}">0</div><div class="lbl">Friends</div></div>
+        <div class="stat-card"><div class="val" th:text="${friendGameCount}">0</div><div class="lbl">游戏</div></div>
+        <div class="stat-card"><div class="val" th:text="${cSym} + ${#numbers.formatDecimal(friendTotalSpent * cRate, 1, cDec)}"></div><div class="lbl">总消费</div></div>
+        <div class="stat-card"><div class="val" th:text="${friendCount}">0</div><div class="lbl">好友</div></div>
     </div>
 
     <div class="profile-grid">
         <div class="main-col">
-            <div class="section-title">Game Library &middot; <span style="color:#8f98a0;font-weight:400" th:text="${friendGameCount} + ' games'"></span></div>
-            <div th:if="${friendGames.isEmpty()}" style="text-align:center;padding:2.5rem;color:#8f98a0">No games in library</div>
+            <div class="section-title">游戏库 &middot; <span style="color:#8f98a0;font-weight:400" th:text="${friendGameCount} + ' 款游戏'"></span></div>
+            <div th:if="${friendGames.isEmpty()}" style="text-align:center;padding:2.5rem;color:#8f98a0">库中暂无游戏</div>
             <div class="games-grid" th:unless="${friendGames.isEmpty()}">
                 <a th:each="p : ${friendGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="game-card">
                     <img th:src="${p.headerImageUrl}" th:alt="${p.name}"
@@ -109,20 +109,20 @@
 
         <div class="side-col">
             <div class="side-card">
-                <h3>Details</h3>
-                <div class="info-row"><span class="k">Username</span><span class="v" th:text="${friend.username}"></span></div>
-                <div class="info-row"><span class="k">Nickname</span><span class="v" th:text="${friendNickname}"></span></div>
-                <div class="info-row"><span class="k">Joined</span><span class="v" th:text="${friendSince != null ? #temporals.format(friendSince, 'MMM yyyy') : '--'}"></span></div>
+                <h3>详细信息</h3>
+                <div class="info-row"><span class="k">用户名</span><span class="v" th:text="${friend.username}"></span></div>
+                <div class="info-row"><span class="k">昵称</span><span class="v" th:text="${friendNickname}"></span></div>
+                <div class="info-row"><span class="k">加入时间</span><span class="v" th:text="${friendSince != null ? #temporals.format(friendSince, 'yyyy 年 MM 月') : '--'}"></span></div>
                 <div th:if="${friendSteamId != null}" class="info-row"><span class="k">Steam ID</span><span class="v" th:text="${friendSteamId}" style="font-size:.72rem"></span></div>
             </div>
 
             <div class="side-card">
-                <h3>Actions</h3>
-                <a th:href="@{/messages?chat={id}(id=${friend.id})}" style="display:block;color:#66c0f4;text-decoration:none;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04)">Send Message</a>
+                <h3>操作</h3>
+                <a th:href="@{/messages?chat={id}(id=${friend.id})}" style="display:block;color:#66c0f4;text-decoration:none;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04)">发送消息</a>
                 <form th:action="@{/friends/remove}" method="post" style="display:inline"
-                      onsubmit="return confirm('Remove this friend?')">
+                      onsubmit="return confirm('确认删除该好友？')">
                     <input type="hidden" name="friendId" th:value="${friend.id}">
-                    <button type="submit" style="background:none;border:none;color:#f88;cursor:pointer;font-size:.82rem;padding:.3rem 0;display:block;width:100%;text-align:left">Remove Friend</button>
+                    <button type="submit" style="background:none;border:none;color:#f88;cursor:pointer;font-size:.82rem;padding:.3rem 0;display:block;width:100%;text-align:left">删除好友</button>
                 </form>
             </div>
         </div>

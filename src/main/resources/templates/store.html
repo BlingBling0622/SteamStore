@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
@@ -16,24 +16,24 @@
         <h3 th:text="#{store.browse}">Browse</h3>
         <a href="/store" class="on" th:text="#{store.allgames}">All Games</a>
         <a href="#" onclick="filt('free',event,this)" th:text="#{store.free}">Free to Play</a>
-        <h3>Genres</h3>
-        <a href="#" onclick="filt('action',event,this)">Action</a>
-        <a href="#" onclick="filt('rpg',event,this)">RPG</a>
-        <a href="#" onclick="filt('strategy',event,this)">Strategy</a>
-        <a href="#" onclick="filt('adventure',event,this)">Adventure</a>
-        <a href="#" onclick="filt('simulation',event,this)">Simulation</a>
-        <a href="#" onclick="filt('indie',event,this)">Indie</a>
+        <h3>类型</h3>
+        <a href="#" onclick="filt('action',event,this)">动作</a>
+        <a href="#" onclick="filt('rpg',event,this)">角色扮演</a>
+        <a href="#" onclick="filt('strategy',event,this)">策略</a>
+        <a href="#" onclick="filt('adventure',event,this)">冒险</a>
+        <a href="#" onclick="filt('simulation',event,this)">模拟</a>
+        <a href="#" onclick="filt('indie',event,this)">独立</a>
     </aside>
     <div class="flex1 p2">
-        <div class="fs-sm muted mb1"><a href="/">Home</a> &rsaquo; <span th:text="#{nav.store}">Store</span></div>
+        <div class="fs-sm muted mb1"><a href="/">首页</a> &rsaquo; <span th:text="#{nav.store}">Store</span></div>
         <h1 style="font-size:1.5rem;color:var(--white);font-weight:300;margin-bottom:.2rem" th:text="#{store.allgames}">Browse Games</h1>
         <p class="muted fs-sm mb1"><span th:text="${products.size()}"></span> <span th:text="#{store.games}">games</span></p>
         <div class="bar">
             <button class="b on" onclick="filt('all',event,this)" th:text="#{store.allgames}">All</button>
-            <button class="b" onclick="filt('action',event,this)">Action</button>
-            <button class="b" onclick="filt('rpg',event,this)">RPG</button>
-            <button class="b" onclick="filt('strategy',event,this)">Strategy</button>
-            <button class="b" onclick="filt('indie',event,this)">Indie</button>
+            <button class="b" onclick="filt('action',event,this)">动作</button>
+            <button class="b" onclick="filt('rpg',event,this)">角色扮演</button>
+            <button class="b" onclick="filt('strategy',event,this)">策略</button>
+            <button class="b" onclick="filt('indie',event,this)">独立</button>
             <input type="text" th:placeholder="#{store.search}" id="q" onkeyup="search()">
         </div>
         <div class="ggrid" id="grid">

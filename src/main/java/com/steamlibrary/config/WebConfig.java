@@ -17,9 +17,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public LocaleResolver localeResolver() {
-        EnglishDefaultLocaleResolver resolver = new EnglishDefaultLocaleResolver();
+        ChineseDefaultLocaleResolver resolver = new ChineseDefaultLocaleResolver();
         resolver.setCookieName("lang");
-        resolver.setDefaultLocale(Locale.ENGLISH);
+        resolver.setDefaultLocale(Locale.SIMPLIFIED_CHINESE);
         resolver.setCookieMaxAge(Duration.ofDays(365));
         return resolver;
     }

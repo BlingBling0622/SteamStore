@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
-<title th:text="${user.username}+' - Profile'">Profile</title>
+<title th:text="${user.username}+' - 个人资料'">Profile</title>
 <style>
 .hero{position:relative;height:320px;background-size:cover;background-position:center 20%;display:flex;align-items:flex-end}
 .hero .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(27,40,56,.96) 0%,rgba(27,40,56,.3) 55%,rgba(27,40,56,.1) 100%)}
@@ -19,7 +19,7 @@
 <div class="hero" th:style="'background-image:url(' + ${user.profileBackgroundUrl!=null ? user.profileBackgroundUrl : 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg'} + ')'">
     <div class="ov"></div><div class="hc">
         <div class="av-lg"><img th:if="${user.avatarUrl!=null}" th:src="${user.avatarUrl}" alt="" onerror="this.style.display='none'"><span th:unless="${user.avatarUrl!=null}" th:text="${#strings.toUpperCase(user.username.substring(0,1))}"></span></div>
-        <div class="flex1"><h1 th:text="${user.nickname!=null?user.nickname:user.username}"></h1><div class="sub" th:text="${user.email}"></div><div class="sub"><span th:text="#{profile.membersince}">Member since</span> <span class="accent" th:text="${memberSince!=null?#temporals.format(memberSince,'MMMM yyyy'):'--'}"></span></div></div>
+        <div class="flex1"><h1 th:text="${user.nickname!=null?user.nickname:user.username}"></h1><div class="sub" th:text="${user.email}"></div><div class="sub"><span th:text="#{profile.membersince}">Member since</span> <span class="accent" th:text="${memberSince!=null?#temporals.format(memberSince,'yyyy 年 MM 月'):'--'}"></span></div></div>
         <a href="/profile/edit" class="btn btn-b" th:text="#{profile.edit}">Edit Profile</a>
     </div>
 </div>
@@ -30,11 +30,11 @@
         <div class="stat"><div class="v" th:text="${cSym}+${#numbers.formatDecimal(totalSpent*cRate,1,cDec)}"></div><div class="l" th:text="#{profile.spent}">Spent</div></div>
         <div class="stat"><div class="v" th:text="${friendsCount}">0</div><div class="l" th:text="#{profile.friends}">Friends</div></div>
         <div class="stat"><div class="v" th:text="${groupCount}">0</div><div class="l" th:text="#{profile.groups}">Groups</div></div>
-        <div class="stat"><div class="v fs-sm" th:text="${steamLinked?'Linked':'--'}"></div><div class="l" th:text="#{profile.steam}">Steam</div></div>
+        <div class="stat"><div class="v fs-sm" th:text="${steamLinked?'已绑定':'--'}"></div><div class="l" th:text="#{profile.steam}">Steam</div></div>
     </div>
     <div class="grid2">
         <div>
-            <h3 style="font-size:.85rem;color:var(--white);text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.08)"><span th:text="#{profile.gamelib}">Game Library</span> &middot; <span class="muted" style="font-weight:400" th:text="${gameCount}+' games'"></span></h3>
+            <h3 style="font-size:.85rem;color:var(--white);text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.08)"><span th:text="#{profile.gamelib}">Game Library</span> &middot; <span class="muted" style="font-weight:400" th:text="${gameCount}+' 款游戏'"></span></h3>
             <div th:if="${purchasedGames.isEmpty()}" style="text-align:center;padding:2rem;color:var(--muted)"><span th:text="#{profile.nogames}">No games yet.</span> <a href="/store" th:text="#{profile.browseStore}">Browse Store</a></div>
             <div class="ggrid" th:unless="${purchasedGames.isEmpty()}">
                 <a th:each="p:${purchasedGames}" th:href="@{/store/game/{id}(id=${p.id})}" class="gcard">
@@ -52,7 +52,7 @@
                 <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted" th:text="#{profile.username}">Username</span><span th:text="${user.username}"></span></div>
                 <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted" th:text="#{profile.nickname}">Nickname</span><span th:text="${user.nickname!=null?user.nickname:'--'}"></span></div>
                 <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted" th:text="#{profile.email}">Email</span><span th:text="${user.email}" style="font-size:.75rem"></span></div>
-                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted" th:text="#{profile.joined}">Joined</span><span th:text="${memberSince!=null?#temporals.format(memberSince,'MMM yyyy'):'--'}"></span></div>
+                <div class="flex" style="justify-content:space-between;padding:.25rem 0;font-size:.8rem"><span class="muted" th:text="#{profile.joined}">Joined</span><span th:text="${memberSince!=null?#temporals.format(memberSince,'yyyy 年 MM 月'):'--'}"></span></div>
             </div>
             <div class="card"><h3 th:text="#{profile.social}">Social</h3>
                 <a href="/friends" class="flex" style="justify-content:space-between;padding:.3rem 0;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04)">

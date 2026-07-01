@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
-    <title th:text="${product.name} + ' on Steam'">Game on Steam</title>
+    <title th:text="${product.name} + ' - Steam 商店'">Steam 上的游戏</title>
     <script src="/dash.all.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -134,7 +134,7 @@
 <div class="hero">
     <div class="hero-inner">
         <div class="breadcrumbs">
-            <a href="/">Home</a> &rsaquo; <a href="/store" th:text="#{nav.store}">Store</a> &rsaquo; <span th:text="${product.name}">Game</span>
+            <a href="/">首页</a> &rsaquo; <a href="/store" th:text="#{nav.store}">Store</a> &rsaquo; <span th:text="${product.name}">Game</span>
         </div>
         <h1 class="game-title" th:text="${product.name}">Game Title</h1>
 
@@ -159,15 +159,15 @@
                 <p class="short-desc" th:text="${product.description}">Game description</p>
 
                 <div th:if="${product.reviewSummary != null}" style="background:#1b2838;border-radius:3px;padding:.8rem;margin-bottom:.75rem">
-                    <div style="font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem">Overall Reviews</div>
+                    <div style="font-size:.75rem;color:#8f98a0;text-transform:uppercase;margin-bottom:.25rem">总体评价</div>
                     <div style="font-size:1.1rem;font-weight:700;color:#66c0f4" th:text="${product.reviewSummary}"></div>
                 </div>
                 <div th:if="${product.developer != null}" class="meta-row">
-                    <span class="label">Developer:</span>
+                    <span class="label">开发商：</span>
                     <span th:text="${product.developer}">Developer</span>
                 </div>
                 <div th:if="${product.publisher != null}" class="meta-row">
-                    <span class="label">Publisher:</span>
+                    <span class="label">发行商：</span>
                     <span th:text="${product.publisher}">Publisher</span>
                 </div>
 
@@ -177,7 +177,7 @@
                 </div>
 
                 <div class="buy-section">
-                    <h3>Buy <span th:text="${product.name}">Game</span></h3>
+                    <h3>购买 <span th:text="${product.name}">Game</span></h3>
                     <div th:if="${product.discountPercent > 0}" class="price-with-discount">
                         <span class="discount-badge" th:text="'-' + ${product.discountPercent} + '%'">-50%</span>
                         <div class="price-stack">
@@ -188,20 +188,20 @@
                     <div th:if="${product.discountPercent == 0}">
                         <span th:if="${product.price > 0}" class="final-price"
                               th:text="${cSym} + ${#numbers.formatDecimal(product.price * cRate, 1, cDec)}">$59.99</span>
-                        <span th:if="${product.price == 0}" class="free-price">Free To Play</span>
+                        <span th:if="${product.price == 0}" class="free-price">免费游玩</span>
                     </div>
 
                     <!-- Free game: claim directly -->
                     <form th:if="${product.price == 0 and (owned == null or not owned)}" action="/store/claim-free" method="post" style="margin-top:1rem">
                         <input type="hidden" name="productId" th:value="${product.id}">
-                        <button type="submit" class="btn-buy">Get Free</button>
+                        <button type="submit" class="btn-buy">免费获取</button>
                     </form>
                     <!-- Paid game: add to cart -->
                     <form th:if="${product.price > 0 and (owned == null or not owned)}" action="/cart/add" method="post" style="margin-top:1rem">
                         <input type="hidden" name="productId" th:value="${product.id}">
-                        <button type="submit" class="btn-buy">Add to Cart</button>
+                        <button type="submit" class="btn-buy">加入购物车</button>
                     </form>
-                    <div th:if="${owned != null and owned}" class="btn-owned">✓ Already in your library</div>
+                    <div th:if="${owned != null and owned}" class="btn-owned">✓ 已在库中</div>
                 </div>
             </div>
         </div>
@@ -210,9 +210,9 @@
 
 <!-- Content Area -->
     <div class="content-area">
-<section th:if="${dlcs != null and !dlcs.isEmpty()}">        <div class="dlc-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">            <h2 style="margin:0;display:flex;align-items:center;gap:.5rem"><span class="arrow">▶</span> DLC - Downloadable Content</h2>        </div>        <div class="dlc-content">            <div class="dlc-grid">                <a th:each="dlc : ${dlcs}" th:href="@{/store/game/{id}(id=${dlc.id})}" class="dlc-card">                    <img th:src="${dlc.headerImageUrl}" th:alt="${dlc.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">                    <div class="dlc-info">                        <h4 th:text="${dlc.name}"></h4>                        <div th:if="${dlc.price > 0}" class="dlc-price" th:text="${cSym} + ${#numbers.formatDecimal(dlc.price * cRate, 1, cDec)}"></div>                        <div th:if="${dlc.price == 0}" class="dlc-price">Free</div>                    </div>                </a>            </div>        </div>    </section>
+<section th:if="${dlcs != null and !dlcs.isEmpty()}">        <div class="dlc-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">            <h2 style="margin:0;display:flex;align-items:center;gap:.5rem"><span class="arrow">▶</span> DLC - 可下载内容</h2>        </div>        <div class="dlc-content">            <div class="dlc-grid">                <a th:each="dlc : ${dlcs}" th:href="@{/store/game/{id}(id=${dlc.id})}" class="dlc-card">                    <img th:src="${dlc.headerImageUrl}" th:alt="${dlc.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">                    <div class="dlc-info">                        <h4 th:text="${dlc.name}"></h4>                        <div th:if="${dlc.price > 0}" class="dlc-price" th:text="${cSym} + ${#numbers.formatDecimal(dlc.price * cRate, 1, cDec)}"></div>                        <div th:if="${dlc.price == 0}" class="dlc-price">免费</div>                    </div>                </a>            </div>        </div>    </section>
         <section>
-            <h2>About This Game</h2>
+            <h2>关于此游戏</h2>
             <div class="about-content">
                 <p th:if="${product.aboutTheGame != null}" th:utext="${product.aboutTheGame}">Game description</p>
                 <p th:if="${product.aboutTheGame == null}" th:text="${product.description}">Game description</p>
@@ -220,26 +220,26 @@
         </section>
 
     <section>
-        <h2>System Requirements</h2>
+        <h2>系统需求</h2>
         <div class="sys-grid">
             <div class="sys-col">
-                <h3>MINIMUM:</h3>
+                <h3>最低配置：</h3>
                 <ul>
-                    <li><strong>OS:</strong> Windows 10 64-bit</li>
-                    <li><strong>Processor:</strong> Intel Core i5-8400 / AMD Ryzen 3 3300X</li>
-                    <li><strong>Memory:</strong> 12 GB RAM</li>
-                    <li><strong>Graphics:</strong> NVIDIA GTX 1060 3GB / AMD RX 580 4GB</li>
-                    <li><strong>Storage:</strong> 60 GB available space</li>
+                    <li><strong>操作系统：</strong> Windows 10 64-bit</li>
+                    <li><strong>处理器：</strong> Intel Core i5-8400 / AMD Ryzen 3 3300X</li>
+                    <li><strong>内存：</strong> 12 GB RAM</li>
+                    <li><strong>显卡：</strong> NVIDIA GTX 1060 3GB / AMD RX 580 4GB</li>
+                    <li><strong>存储空间：</strong> 60 GB 可用空间</li>
                 </ul>
             </div>
             <div class="sys-col">
-                <h3>RECOMMENDED:</h3>
+                <h3>推荐配置：</h3>
                 <ul>
-                    <li><strong>OS:</strong> Windows 10/11 64-bit</li>
-                    <li><strong>Processor:</strong> Intel Core i7-8700K / AMD Ryzen 5 3600X</li>
-                    <li><strong>Memory:</strong> 16 GB RAM</li>
-                    <li><strong>Graphics:</strong> NVIDIA GTX 1070 8GB / AMD RX Vega 56 8GB</li>
-                    <li><strong>Storage:</strong> 60 GB available space</li>
+                    <li><strong>操作系统：</strong> Windows 10/11 64-bit</li>
+                    <li><strong>处理器：</strong> Intel Core i7-8700K / AMD Ryzen 5 3600X</li>
+                    <li><strong>内存：</strong> 16 GB RAM</li>
+                    <li><strong>显卡：</strong> NVIDIA GTX 1070 8GB / AMD RX Vega 56 8GB</li>
+                    <li><strong>存储空间：</strong> 60 GB 可用空间</li>
                 </ul>
             </div>
         </div>
@@ -248,30 +248,30 @@
     <!-- Customer Reviews (live from Steam) -->
     <section id="reviews-section" th:data-game-id="${product.id}">
         <h2 th:text="#{game.reviews}">Overall Reviews</h2>
-        <div id="reviews-loading" style="text-align:center;padding:2rem;color:var(--muted)">Loading reviews...</div>
-        <div id="reviews-error" class="hidden" style="text-align:center;padding:2rem;color:var(--muted)">Could not load reviews.</div>
+        <div id="reviews-loading" style="text-align:center;padding:2rem;color:var(--muted)">正在加载评价...</div>
+        <div id="reviews-error" class="hidden" style="text-align:center;padding:2rem;color:var(--muted)">无法加载评价。</div>
         <div id="reviews-container" class="hidden">
             <div id="reviews-summary"></div>
             <div class="reviews-toolbar">
-                <div class="seg" id="reviews-filter-seg" role="tablist" aria-label="Sort order">
-                    <button type="button" data-filter="recent" class="on">Recent</button>
-                    <button type="button" data-filter="updated">Updated</button>
+                <div class="seg" id="reviews-filter-seg" role="tablist" aria-label="排序方式">
+                    <button type="button" data-filter="recent" class="on">最新</button>
+                    <button type="button" data-filter="updated">最近更新</button>
                 </div>
-                <div class="seg" id="reviews-type-seg" role="tablist" aria-label="Review type">
-                    <button type="button" data-type="all" class="on">All</button>
-                    <button type="button" data-type="positive">Positive</button>
-                    <button type="button" data-type="negative">Negative</button>
+                <div class="seg" id="reviews-type-seg" role="tablist" aria-label="评价类型">
+                    <button type="button" data-type="all" class="on">全部</button>
+                    <button type="button" data-type="positive">好评</button>
+                    <button type="button" data-type="negative">差评</button>
                 </div>
-                <div class="seg" id="reviews-lang-seg" role="tablist" aria-label="Review language">
-                    <button type="button" data-lang="all" class="on">All</button>
-                    <button type="button" data-lang="english">English</button>
+                <div class="seg" id="reviews-lang-seg" role="tablist" aria-label="评价语言">
+                    <button type="button" data-lang="all" class="on">全部</button>
+                    <button type="button" data-lang="english">英文</button>
                     <button type="button" data-lang="schinese,tchinese">中文</button>
                 </div>
-                <span class="src" th:if="${appId != null}">Source: <a th:href="'https://store.steampowered.com/app/' + ${appId} + '/'" target="_blank" rel="noopener">Steam</a></span>
+                <span class="src" th:if="${appId != null}">来源：<a th:href="'https://store.steampowered.com/app/' + ${appId} + '/'" target="_blank" rel="noopener">Steam</a></span>
             </div>
             <div id="reviews-list"></div>
             <div class="reviews-more-wrap">
-                <button type="button" class="reviews-more-btn" id="reviews-more-btn">Show more reviews</button>
+                <button type="button" class="reviews-more-btn" id="reviews-more-btn">显示更多评价</button>
             </div>
         </div>
     </section>
@@ -416,7 +416,7 @@
     function resetAndLoad(){
         state.cursor = '*'; state.hasMore = true; state.totalLoaded = 0;
         listEl.innerHTML = '';
-        moreBtn.disabled = false; moreBtn.textContent = 'Show more reviews';
+        moreBtn.disabled = false; moreBtn.textContent = '显示更多评价';
         summaryEl.innerHTML = '';
         loadPage(false);
     }
@@ -429,7 +429,7 @@
             container.classList.add('hidden');
             errorEl.classList.add('hidden');
         } else {
-            moreBtn.disabled = true; moreBtn.textContent = 'Loading...';
+            moreBtn.disabled = true; moreBtn.textContent = '加载中...';
         }
         doFetch(append, 0);
     }
@@ -457,10 +457,10 @@
                 if(!append) container.classList.remove('hidden');
                 summaryEl.innerHTML = '';
                 listEl.innerHTML = '<div class="reviews-error-box">'
-                    + '<div style="font-size:.9rem;color:#fff;margin-bottom:.35rem">Could not load Steam reviews</div>'
+                    + '<div style="font-size:.9rem;color:#fff;margin-bottom:.35rem">无法加载 Steam 评价</div>'
                     + '<div style="font-size:.78rem;color:var(--muted)">' + esc(errorReason) + '</div>'
                     + '</div>';
-                moreBtn.disabled = true; moreBtn.textContent = 'Show more reviews';
+                moreBtn.disabled = true; moreBtn.textContent = '显示更多评价';
                 state.hasMore = false; state.cursor = null;
                 return;
             }
@@ -491,15 +491,15 @@
             state.cursor = d.cursor || null;
             state.hasMore = !!d.has_more;
             if(!state.hasMore || !raw.length){
-                moreBtn.disabled = true; moreBtn.textContent = 'No more reviews';
-                if(state.totalLoaded > 0) appendEnd('End of reviews');
+                moreBtn.disabled = true; moreBtn.textContent = '没有更多评价了';
+                if(state.totalLoaded > 0) appendEnd('已显示全部评价');
             } else {
-                moreBtn.disabled = false; moreBtn.textContent = 'Show more reviews';
+                moreBtn.disabled = false; moreBtn.textContent = '显示更多评价';
             }
         }).catch(function(){
             state.loading = false;
             loadingEl.classList.add('hidden');
-            if(append){ moreBtn.disabled = false; moreBtn.textContent = 'Show more reviews'; }
+            if(append){ moreBtn.disabled = false; moreBtn.textContent = '显示更多评价'; }
             else { errorEl.classList.remove('hidden'); }
         });
     }
@@ -528,9 +528,9 @@
         // Steam's query_summary always reflects ALL reviews (not the filtered subset),
         // so the totals look identical no matter which review_type is selected. Add a
         // clear note so users can see the filter is actually active.
-        var sub = total.toLocaleString() + ' user reviews';
-        if(state.type === 'positive') sub += ' \u00b7 positive only (filtered)';
-        else if(state.type === 'negative') sub += ' \u00b7 negative only (filtered)';
+        var sub = total.toLocaleString() + ' 条评价';
+        if(state.type === 'positive') sub += ' \u00b7 仅好评（已筛选）';
+        else if(state.type === 'negative') sub += ' \u00b7 仅差评（已筛选）';
         var html = '<div class="reviews-summary">'
             + '<div>'
             + (desc ? '<div class="score-desc">' + esc(desc) + '</div>' : '')
@@ -538,7 +538,7 @@
             + '</div>'
             + '<div class="reviews-ratio">'
             + '<div class="reviews-ratio-bar"><div class="pos" style="width:' + posPct + '%"></div><div class="neg" style="width:' + negPct + '%"></div></div>'
-            + '<div class="reviews-ratio-labels"><span class="p">' + pos.toLocaleString() + ' positive (' + posPct + '%)</span><span class="n">' + neg.toLocaleString() + ' negative (' + negPct + '%)</span></div>'
+            + '<div class="reviews-ratio-labels"><span class="p">' + pos.toLocaleString() + ' 好评 (' + posPct + '%)</span><span class="n">' + neg.toLocaleString() + ' 差评 (' + negPct + '%)</span></div>'
             + '</div>'
             + '</div>';
         summaryEl.innerHTML = html;
@@ -547,7 +547,7 @@
     function renderReviews(reviews, append){
         if(!reviews.length){
             if(!append){
-                listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted)">No reviews match this filter yet.</div>';
+                listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted)">暂无符合此筛选条件的评价。</div>';
             }
             return;
         }
@@ -562,8 +562,8 @@
 
     function renderOne(r){
         var rec = r.voted_up ? 'rec' : 'not';
-        var date = r.created ? new Date(r.created*1000).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : '';
-        var name = r.author || 'Steam User';
+        var date = r.created ? new Date(r.created*1000).toLocaleDateString('zh-CN',{year:'numeric',month:'short',day:'numeric'}) : '';
+        var name = r.author || 'Steam 用户';
         var initial = name.charAt(0).toUpperCase();
         var avatar = r.avatar
             ? '<img src="' + esc(r.avatar) + '" alt="" onerror="this.parentNode.classList.add(\'no-img\');this.parentNode.textContent=' + JSON.stringify(initial) + '">'
@@ -574,23 +574,23 @@
         var hrs = typeof r.hours === 'number' ? r.hours.toFixed(1) : '0.0';
 
         var badges = '';
-        if(r.early_access) badges += '<span class="review-badge">Early Access Review</span>';
-        if(r.received_for_free) badges += '<span class="review-badge">Product received for free</span>';
+        if(r.early_access) badges += '<span class="review-badge">抢先体验评价</span>';
+        if(r.received_for_free) badges += '<span class="review-badge">免费获得的产品</span>';
         if(state.lang === 'all' && r.language) badges += '<span class="review-badge">' + esc(langLabel(r.language)) + '</span>';
 
         var footer = '';
-        if(r.helpful > 0) footer += '<span>' + r.helpful.toLocaleString() + ' found this helpful</span>';
-        if(r.funny > 0) footer += '<span>' + r.funny.toLocaleString() + ' found this funny</span>';
-        if(r.comments > 0) footer += '<span>' + r.comments.toLocaleString() + ' comment' + (r.comments>1?'s':'') + '</span>';
+        if(r.helpful > 0) footer += '<span>' + r.helpful.toLocaleString() + ' 人觉得有价值</span>';
+        if(r.funny > 0) footer += '<span>' + r.funny.toLocaleString() + ' 人觉得搞笑</span>';
+        if(r.comments > 0) footer += '<span>' + r.comments.toLocaleString() + ' 条评论</span>';
 
         return '<div class="review-item">'
             + '<div class="review-header">'
             +   '<div class="review-avatar">' + avatar + '</div>'
             +   '<div class="review-info">'
             +     '<div class="name">' + nameHtml + '</div>'
-            +     '<div class="meta">' + hrs + ' hrs on record' + (r.hours_at_review ? ' <span class="dot">·</span> ' + r.hours_at_review.toFixed(1) + ' hrs at review' : '') + (date ? ' <span class="dot">·</span> ' + date : '') + '</div>'
+            +     '<div class="meta">' + hrs + ' 小时游戏时长' + (r.hours_at_review ? ' <span class="dot">·</span> ' + r.hours_at_review.toFixed(1) + ' 小时（评价时）' : '') + (date ? ' <span class="dot">·</span> ' + date : '') + '</div>'
             +   '</div>'
-            +   '<div class="review-vote ' + rec + '">' + (r.voted_up ? 'Recommended' : 'Not Recommended') + '</div>'
+            +   '<div class="review-vote ' + rec + '">' + (r.voted_up ? '推荐' : '不推荐') + '</div>'
             + '</div>'
             + (badges ? '<div class="review-badges">' + badges + '</div>' : '')
             + '<div class="review-content">' + esc(r.content || '') + '</div>'

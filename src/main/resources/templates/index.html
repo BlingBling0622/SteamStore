@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Steam Store</title>
+<title>Steam 商店</title>
 <link rel="stylesheet" href="/css/steam.css">
 <link rel="stylesheet" href="/css/steam-nav.css">
 <style>
@@ -38,7 +38,7 @@
 
 <div class="hero">
     <div class="hero-inner">
-        <div class="section-label"><span>Featured &amp; Recommended</span><span id="carouselCounter"></span></div>
+        <div class="section-label"><span>精选 &amp; 推荐</span><span id="carouselCounter"></span></div>
         <div class="carousel-wrapper" id="carouselWrapper">
             <button class="carousel-arrow carousel-prev" onclick="changeSlide(-1);event.stopPropagation()">&#10094;</button>
             <button class="carousel-arrow carousel-next" onclick="changeSlide(1);event.stopPropagation()">&#10095;</button>
@@ -60,7 +60,7 @@
                 <div class="flex gap2" style="align-items:center;margin-top:.3rem">
                     <span class="gdisc" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + '%'"></span>
                     <span class="gold" th:if="${p.discountPercent > 0}" th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
-                    <span class="gfree" th:if="${p.price == 0}">Free</span>
+                    <span class="gfree" th:if="${p.price == 0}">免费</span>
                     <span class="gcur" th:if="${p.price > 0 and p.discountPercent > 0}" th:text="${cSym} + ${#numbers.formatDecimal(p.price * (1 - p.discountPercent / 100.0) * cRate, 1, cDec)}"></span>
                     <span class="gcur" th:if="${p.price > 0 and p.discountPercent == 0}" th:text="${cSym} + ${#numbers.formatDecimal(p.price * cRate, 1, cDec)}"></span>
                 </div>
@@ -73,7 +73,7 @@
     <span class="gd-item" th:each="p : ${allProducts}" th:data-id="${p.id}" th:data-name="${p.name}" th:data-img="${p.screenshot1Url != null ? p.screenshot1Url : p.headerImageUrl}" th:data-tags="${p.tags}"></span>
 </div>
 
-<footer>&copy; 2026 Steam Store &nbsp;&middot;&nbsp; Not affiliated with Valve Corporation</footer>
+<footer><span th:text="#{footer.copy}"></span> &nbsp;&middot;&nbsp; <span th:text="#{footer.disclaimer}"></span></footer>
 
 <script>
 var carouselGames = [], carouselIdx = 0, carouselTimer = null;

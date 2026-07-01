@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!DOCTYPE html><html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css"><title>Friends - Steam</title>
+<link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css"><title>好友 - Steam</title>
 <style>
 .panel{display:flex;flex:1;overflow:hidden}.sb{width:280px;background:var(--bg2);padding:1rem;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;gap:.8rem}
 .sb h3{font-size:.68rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;font-weight:600}
@@ -16,21 +16,21 @@
 </style></head><body>
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
 <div class="panel flex1"><aside class="sb">
-<h3 th:text="#{friends.add}">ADD A FRIEND</h3><div class="sbox"><input type="text" th:placeholder="#{friends.search}" id="q" oninput="doSearch()" onfocus="showRes()" autocomplete="off"><div class="sres" id="res"></div></div>
-<div th:if="${!pendingRequests.isEmpty()}"><h3>PENDING <span class="fs-xs muted" th:text="'('+${pendingCount}+')'"></span></h3>
+<h3 th:text="#{friends.add}">添加好友</h3><div class="sbox"><input type="text" th:placeholder="#{friends.search}" id="q" oninput="doSearch()" onfocus="showRes()" autocomplete="off"><div class="sres" id="res"></div></div>
+<div th:if="${!pendingRequests.isEmpty()}"><h3>待处理 <span class="fs-xs muted" th:text="'('+${pendingCount}+')'"></span></h3>
 <div th:each="r:${pendingRequests}"><div class="pend">
 <div class="fav" style="width:26px;height:26px;font-size:.6rem"><img th:if="${r.senderAvatarUrl!=null and !r.senderAvatarUrl.isEmpty()}" th:src="${r.senderAvatarUrl}" alt=""><span th:unless="${r.senderAvatarUrl!=null and !r.senderAvatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(r.senderUsername.substring(0,1))}"></span></div>
 <div class="info"><div class="white fs-sm" th:text="${r.senderNickname}"></div><div class="fs-xs muted" th:text="${#temporals.format(r.createdAt,'MMM d')}"></div></div>
-<div class="acts"><form th:action="@{/friends/accept}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:var(--green);color:#d2e885"th:text="#{friends.accept}">Accept</button></form>
-<form th:action="@{/friends/decline}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:#555;color:#aaa"th:text="#{friends.decline}">Decline</button></form></div></div></div></div>
-<div style="flex:1"><h3>FRIENDS <span class="fs-xs muted" th:text="'('+${friendsCount}+')'"></span></h3>
-<div th:if="${friends.isEmpty()}" class="fs-sm muted p1"th:text="#{friends.nofriends}">No friends yet.</div>
+<div class="acts"><form th:action="@{/friends/accept}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:var(--green);color:#d2e885"th:text="#{friends.accept}">接受</button></form>
+<form th:action="@{/friends/decline}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:#555;color:#aaa"th:text="#{friends.decline}">拒绝</button></form></div></div></div></div>
+<div style="flex:1"><h3>好友 <span class="fs-xs muted" th:text="'('+${friendsCount}+')'"></span></h3>
+<div th:if="${friends.isEmpty()}" class="fs-sm muted p1"th:text="#{friends.nofriends}">暂无好友。</div>
 <div class="flist"><div th:each="f:${friends}" class="fitem" th:data-id="${f.id}" th:data-username="${f.username}" th:data-nickname="${f.nickname}" th:data-email="${f.email}" th:data-avatar="${f.avatarUrl}" th:data-since="${f.since}" th:data-updated="${f.updatedAt}" onclick="sel(this)"><div class="fav"><img th:if="${!f.avatarUrl.isEmpty()}" th:src="${f.avatarUrl}" alt=""><span th:if="${f.avatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(f.username.substring(0,1))}"></span></div><div class="flex1"><div class="white fs-sm" th:text="${f.nickname}"></div></div></div></div></div>
 </aside>
 <main class="main2"><div th:if="${success}" class="alert alert-ok" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${success}"></div><div th:if="${error}" class="alert alert-err" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${error}"></div>
-<div id="empty" style="text-align:center;color:var(--muted)"><h3 style="color:var(--white)"th:text="#{friends.select}">Select a friend</h3><p class="fs-sm"th:text="#{friends.selectdesc}">Choose from the list to view their profile</p></div>
+<div id="empty" style="text-align:center;color:var(--muted)"><h3 style="color:var(--white)"th:text="#{friends.select}">选择好友</h3><p class="fs-sm"th:text="#{friends.selectdesc}">从列表中选择好友查看资料</p></div>
 <div id="prof" class="pcard hidden"><div class="hd"><div class="fav av-lg" id="pa"><img id="pai" src="" alt="" class="hidden"><span id="pal"></span></div><div class="flex1"><h2 id="pn"></h2><div class="fs-sm muted" id="pe"></div><div class="fs-xs muted" id="ps"></div></div></div>
-<div id="pd" class="mb1"></div><div class="flex gap1"><a id="pmsg" href="#" class="btn btn-g"th:text="#{friends.sendmsg}">Send Message</a><a id="pprof" href="#" class="btn btn-b"th:text="#{friends.viewprof}">View Profile</a><form id="prem" th:action="@{/friends/remove}" method="post" style="display:inline" onsubmit="return confirm('Remove?')"><input type="hidden" name="friendId" id="prid"><button class="btn btn-r"th:text="#{friends.remove}">Remove</button></form></div></div>
+<div id="pd" class="mb1"></div><div class="flex gap1"><a id="pmsg" href="#" class="btn btn-g"th:text="#{friends.sendmsg}">发送消息</a><a id="pprof" href="#" class="btn btn-b"th:text="#{friends.viewprof}">查看资料</a><form id="prem" th:action="@{/friends/remove}" method="post" style="display:inline" onsubmit="return confirm('确认移除？')"><input type="hidden" name="friendId" id="prid"><button class="btn btn-r"th:text="#{friends.remove}">删除好友</button></form></div></div>
 </main></div>
 <footer><span th:text="#{footer.copy}"></span>  <span th:text="#{footer.disclaimer}"></span></footer>
 <script>
@@ -42,10 +42,10 @@ function doSearch(){
     tmr=setTimeout(function(){
         fetch('/friends/search?q='+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(u){
             var h='';
-            if(!u.length) h='<div style="padding:.4rem .6rem;color:var(--muted);font-size:.75rem"th:text="#{friends.nousers}">No users found</div>';
+            if(!u.length) h='<div style="padding:.4rem .6rem;color:var(--muted);font-size:.75rem"th:text="#{friends.nousers}">未找到用户</div>';
             for(var i=0;i<u.length;i++){
                 var avatarHtml = u[i].avatarUrl ? '<img src="'+esc(u[i].avatarUrl)+'" alt="">' : u[i].username.charAt(0).toUpperCase();
-                h+='<div class="r"><div style="display:flex;align-items:center;gap:.4rem;min-width:0"><div class="av">'+avatarHtml+'</div><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(u[i].nickname)+'</span></div><form action="/friends/send" method="post"><input type="hidden" name="receiverId" value="'+u[i].id+'"><button class="btn-xs" style="background:var(--green);color:#d2e885"th:text="#{friends.add}">Add</button></form></div>';
+                h+='<div class="r"><div style="display:flex;align-items:center;gap:.4rem;min-width:0"><div class="av">'+avatarHtml+'</div><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(u[i].nickname)+'</span></div><form action="/friends/send" method="post"><input type="hidden" name="receiverId" value="'+u[i].id+'"><button class="btn-xs" style="background:var(--green);color:#d2e885"th:text="#{friends.add}">添加</button></form></div>';
             }
             b.innerHTML=h;b.classList.add('show');
         });
@@ -62,7 +62,7 @@ function sel(el){
         e=el.getAttribute('data-email'), a=el.getAttribute('data-avatar'), s=el.getAttribute('data-since');
     document.getElementById('pn').textContent=n;
     document.getElementById('pe').textContent=e;
-    document.getElementById('ps').textContent=s?'Member since '+new Date(s).toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
+    document.getElementById('ps').textContent=s?'注册时间 '+new Date(s).toLocaleDateString('zh-CN',{month:'long',year:'numeric'}):'';
     document.getElementById('pmsg').href='/messages?chat='+id;
     document.getElementById('pprof').href='/friends/'+id;
     document.getElementById('prid').value=id;
@@ -80,8 +80,8 @@ function sel(el){
                 var img=document.createElement('img');img.src=p.avatarUrl;el.querySelector('.fav').appendChild(img);}
         }
         var d=document.getElementById('pd'), h='<div class="flex gap1 mt1" style="border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">';
-        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">'+(p.gameCount||0)+'</div><div class="fs-xs muted">Games</div></div>';
-        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">$'+(p.totalSpent||0).toFixed(2)+'</div><div class="fs-xs muted">Spent</div></div></div>';
+        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">'+(p.gameCount||0)+'</div><div class="fs-xs muted">游戏</div></div>';
+        h+='<div style="text-align:center"><div style="font-size:1.2rem;color:var(--accent)">'+(p.totalSpent||0).toFixed(2)+'</div><div class="fs-xs muted">总消费</div></div></div>';
         d.innerHTML=h;
     });
 }

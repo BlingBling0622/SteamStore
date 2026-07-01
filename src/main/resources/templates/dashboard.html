@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/css/steam.css"><link rel="stylesheet" href="/css/steam-nav.css">
-<title>Library - Steam</title>
+<title>游戏库 - Steam</title>
 <style>.main{padding:1.5rem 2rem}.sbar h3{font-size:.7rem;color:#5c7e9c;text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .4rem;font-weight:600}.sbar h3:first-child{margin-top:0}
 .sbar a{display:flex;justify-content:space-between;align-items:center;color:var(--text);padding:.3rem .5rem;border-radius:2px;font-size:.85rem}
 .sbar a:hover,.sbar a.on{background:rgba(103,193,245,.15);color:var(--accent)}.sbar a.on{background:var(--accent);color:var(--white)}
@@ -14,10 +14,10 @@
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
 <div class="wrap flex flex1">
     <aside class="side sbar">
-        <h3>Library</h3>
-        <a href="#" class="on" data-filter="all">All Games <span class="badge" th:text="${gameCount}">0</span></a>
-        <a href="#" data-filter="favorites">Favorites <span class="badge" id="favBadge">0</span></a>
-<h3 th:text="Collections">Collections</h3><a th:each="tag:${allTags}" href="#" th:attr="data-tag=${tag}"><span th:text="${#messages.msgOrNull('tag.' + tag) ?: tag}"></span></a>
+        <h3>库</h3>
+        <a href="#" class="on" data-filter="all">所有游戏 <span class="badge" th:text="${gameCount}">0</span></a>
+        <a href="#" data-filter="favorites">收藏 <span class="badge" id="favBadge">0</span></a>
+<h3>合集</h3><a th:each="tag:${allTags}" href="#" th:attr="data-tag=${tag}"><span th:text="${#messages.msgOrNull('tag.' + tag) ?: tag}"></span></a>
     </aside>
     <div class="main flex1">
         <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
