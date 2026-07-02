@@ -66,7 +66,11 @@
         .content-area{max-width:1200px;margin:2rem auto;padding:0 20px}
         section{background:rgba(22,32,45,.3);border-radius:4px;padding:1.5rem;margin-bottom:2rem}
         section h2{font-size:1.25rem;color:#fff;font-weight:600;margin-bottom:1rem;text-transform:uppercase}
-        .about-content{line-height:1.8;color:#c6d4df}
+        .about-content{line-height:1.8;color:#c6d4df;position:relative}
+        /* Expanded state reserves bottom space so the absolute-positioned
+           "收起" toggle doesn't overlap the last paragraph. Collapsed state
+           needs no such padding — the toggle sits on the gradient mask. */
+        .about-content:not(.collapsed){padding-bottom:1.6rem}
         /* Steam's aboutTheGame HTML: constrain images, center them, and tidy text */
         .about-content img,.about-content video{display:block !important;max-width:100% !important;height:auto !important;margin:1rem auto;border-radius:3px}
         /* Steam wraps media in inline <span class="bb_img_ctn"> — make it block so the
@@ -79,6 +83,13 @@
         .about-content ul,.about-content ol{margin:0 0 1rem 1.5rem}
         .about-content li{margin-bottom:.4rem}
         .about-content iframe{max-width:100%;border-radius:3px}
+        /* About-section collapse: show only a slice by default, expand on click.
+           The ::after gradient masks the clipped edge so content fades out
+           instead of being hard-cut at max-height. */
+        .about-content.collapsed{max-height:320px;overflow:hidden}
+        .about-content.collapsed::after{content:'';position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(to bottom,rgba(22,32,45,0),rgba(22,32,45,.92));pointer-events:none}
+        .about-toggle{position:absolute;right:0;bottom:0;background:none;border:none;color:#66c0f4;cursor:pointer;padding:.3rem 0 0;font-size:.82rem;font-family:inherit;z-index:2}
+        .about-toggle:hover{text-decoration:underline}
         .sys-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
         .sys-col h3{font-size:.9rem;color:#8f98a0;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:.5rem}
         .sys-col ul{list-style:none}
@@ -237,9 +248,10 @@
 <section th:if="${dlcs != null and !dlcs.isEmpty()}">        <div class="dlc-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">            <h2 style="margin:0;display:flex;align-items:center;gap:.5rem"><span class="arrow">▶</span> DLC - 可下载内容</h2>        </div>        <div class="dlc-content">            <div class="dlc-grid">                <a th:each="dlc : ${dlcs}" th:href="@{/store/game/{id}(id=${dlc.id})}" class="dlc-card">                    <img th:src="${dlc.headerImageUrl}" th:alt="${dlc.name}" onerror="this.src='https://store.akamai.steamstatic.com/public/images/v6/acct/empty_steamgame_96x96.png'">                    <div class="dlc-info">                        <h4 th:text="${dlc.name}"></h4>                        <div th:if="${dlc.price > 0}" class="dlc-price" th:text="${cSym} + ${#numbers.formatDecimal(dlc.price * cRate, 1, cDec)}"></div>                        <div th:if="${dlc.price == 0}" class="dlc-price">免费</div>                    </div>                </a>            </div>        </div>    </section>
         <section>
             <h2>关于此游戏</h2>
-            <div class="about-content">
+            <div class="about-content collapsed" id="aboutContent">
                 <p th:if="${product.aboutTheGame != null}" th:utext="${product.aboutTheGame}">Game description</p>
                 <p th:if="${product.aboutTheGame == null}" th:text="${product.description}">Game description</p>
+                <button type="button" class="about-toggle" id="aboutToggle" style="display:none">展开更多 ▾</button>
             </div>
         </section>
 
@@ -390,6 +402,33 @@
 	});
 	/*]]>*/
 	</script>
+<script>
+// About-section collapse: only show a slice of the description by default,
+// expand to full height on click. The toggle button stays hidden if the
+// content is short enough to fit in the collapsed preview (scrollHeight is
+// measured against the 320px max-height + buffer).
+(function(){
+    var content = document.getElementById('aboutContent');
+    var toggle  = document.getElementById('aboutToggle');
+    if(!content || !toggle) return;
+    function check(){
+        if(content.scrollHeight > 340){
+            toggle.style.display = 'inline-block';
+        }else{
+            toggle.style.display = 'none';
+            content.classList.remove('collapsed');
+        }
+    }
+    setTimeout(check, 100);
+    content.querySelectorAll('img').forEach(function(img){
+        if(!img.complete) img.addEventListener('load', check);
+    });
+    toggle.addEventListener('click', function(){
+        var collapsed = content.classList.toggle('collapsed');
+        toggle.textContent = collapsed ? '展开更多 ▾' : '收起 ▴';
+    });
+})();
+</script>
 <script>
 (function(){
     var gameId = document.getElementById('reviews-section').getAttribute('data-game-id') || '0';
