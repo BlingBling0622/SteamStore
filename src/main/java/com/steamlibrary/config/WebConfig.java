@@ -1,5 +1,6 @@
 package com.steamlibrary.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -13,7 +14,10 @@ import java.time.Duration;
 import java.util.Locale;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    private final UserActivityInterceptor userActivityInterceptor;
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -35,6 +39,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(userActivityInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico",
+                        "/login", "/register", "/h2-console/**", "/auth/steam/**");
     }
 
     @Override

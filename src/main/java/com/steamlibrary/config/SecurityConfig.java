@@ -1,6 +1,8 @@
 package com.steamlibrary.config;
 
+import com.steamlibrary.model.User;
 import com.steamlibrary.service.CustomUserDetailsService;
+import com.steamlibrary.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +11,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -19,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final UserService userService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
@@ -35,10 +37,24 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/dashboard", true)
+                .successHandler((request, response, authentication) -> {
+                    try {
+                        User u = userService.findByUsername(authentication.getName());
+                        if (u != null) userService.updateLastSeenAt(u.getId());
+                    } catch (Exception ignored) {}
+                    response.sendRedirect("/dashboard");
+                })
                 .permitAll()
             )
             .logout(logout -> logout
+                .addLogoutHandler((request, response, authentication) -> {
+                    try {
+                        if (authentication != null) {
+                            User u = userService.findByUsername(authentication.getName());
+                            if (u != null) userService.clearLastSeenAt(u.getId());
+                        }
+                    } catch (Exception ignored) {}
+                })
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
@@ -50,11 +66,6 @@ public class SecurityConfig {
             );
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean

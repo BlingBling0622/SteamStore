@@ -98,20 +98,29 @@ textarea{resize:none}
 
 /* === Chat messages === */
 .chat-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.35rem}
-.msg-row{display:flex;gap:.5rem;max-width:70%;margin-bottom:.15rem}
+.msg-row{display:flex;gap:.5rem;max-width:70%;margin-bottom:.15rem;min-width:0}
 .msg-row.mine{align-self:flex-end;flex-direction:row-reverse;margin-left:auto}
 .msg-row.other{align-self:flex-start;margin-right:auto}
 .msg-row.new{margin-top:1.2rem}
 .msg-av{width:30px;height:30px;border-radius:50%;background:var(--border1);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden;align-self:flex-start;margin-top:8px}
 .msg-av img{width:100%;height:100%;object-fit:cover}
 .msg-av.ghost{visibility:hidden}
-.msg-bub{padding:.45rem .7rem;border-radius:3px;font-size:.84rem;line-height:1.4;word-break:break-word}
+.msg-bub{padding:.45rem .7rem;border-radius:3px;font-size:.84rem;line-height:1.4;word-break:break-word;white-space:pre-wrap;min-width:0;overflow-wrap:anywhere}
 .msg-row.mine .msg-bub{background:var(--border1);border-top-right-radius:0}
 .msg-row.other .msg-bub{background:var(--bg2);border:1px solid var(--border1);border-top-left-radius:0}
 .msg-sender{font-size:.62rem;color:var(--accent);margin-bottom:1px}
 .msg-row.mine .msg-sender{display:none}
 .msg-time{font-size:.6rem;color:var(--muted);margin-top:2px}
 .msg-row.mine .msg-time{text-align:right}
+
+/* === Giphy GIF messages === */
+.gif-msg{max-width:200px;max-height:200px;border-radius:4px;display:block;cursor:zoom-in}
+.giphy-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:.5rem;max-height:220px;overflow-y:auto}
+.giphy-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.giphy-grid .giphy-item{position:relative;cursor:pointer;border-radius:3px;overflow:hidden;background:#000}
+.giphy-grid .giphy-item img{width:100%;height:78px;object-fit:cover;display:block}
+.giphy-grid .giphy-item:hover{outline:2px solid var(--accent);outline-offset:-1px}
+.giphy-empty{color:var(--muted);font-size:.78rem;padding:.8rem;text-align:center}
 
 /* === Forms === */
 .form-g{margin-bottom:1rem}

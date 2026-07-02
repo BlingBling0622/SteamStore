@@ -13,6 +13,7 @@
 .main2{flex:1;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:center;overflow-y:auto}
 .pcard{background:var(--bg2);border:1px solid var(--border3);border-radius:4px;padding:1.5rem;max-width:480px;width:100%}
 .pcard .hd{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.pcard .hd .fav{width:72px;height:72px}.pcard .hd h2{font-size:1.3rem;color:var(--white);font-weight:300}
+.fstat{display:flex;align-items:center;gap:.3rem;font-size:.65rem;margin-top:1px}.fstat .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.fstat.on .dot{background:#588a1b;box-shadow:0 0 4px rgba(90,138,27,.8)}.fstat.on .t{color:var(--green2)}.fstat.off .dot{background:#555}.fstat.off .t{color:var(--muted)}
 </style></head><body>
 <div th:replace="~{fragments/nav :: steam-nav}"></div>
 <div class="panel flex1"><aside class="sb">
@@ -25,7 +26,7 @@
 <form th:action="@{/friends/decline}" method="post"><input type="hidden" name="requestId" th:value="${r.id}"><button class="btn-xs" style="background:#555;color:#aaa"th:text="#{friends.decline}">拒绝</button></form></div></div></div></div>
 <div style="flex:1"><h3>好友 <span class="fs-xs muted" th:text="'('+${friendsCount}+')'"></span></h3>
 <div th:if="${friends.isEmpty()}" class="fs-sm muted p1"th:text="#{friends.nofriends}">暂无好友。</div>
-<div class="flist"><div th:each="f:${friends}" class="fitem" th:data-id="${f.id}" th:data-username="${f.username}" th:data-nickname="${f.nickname}" th:data-email="${f.email}" th:data-avatar="${f.avatarUrl}" th:data-since="${f.since}" th:data-updated="${f.updatedAt}" onclick="sel(this)"><div class="fav"><img th:if="${!f.avatarUrl.isEmpty()}" th:src="${f.avatarUrl}" alt=""><span th:if="${f.avatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(f.username.substring(0,1))}"></span></div><div class="flex1"><div class="white fs-sm" th:text="${f.nickname}"></div></div></div></div></div>
+<div class="flist"><div th:each="f:${friends}" class="fitem" th:data-id="${f.id}" th:data-username="${f.username}" th:data-nickname="${f.nickname}" th:data-email="${f.email}" th:data-avatar="${f.avatarUrl}" th:data-since="${f.since}" th:data-updated="${f.updatedAt}" onclick="sel(this)"><div class="fav"><img th:if="${!f.avatarUrl.isEmpty()}" th:src="${f.avatarUrl}" alt=""><span th:if="${f.avatarUrl.isEmpty()}" th:text="${#strings.toUpperCase(f.username.substring(0,1))}"></span></div><div class="flex1"><div class="white fs-sm" th:text="${f.nickname}"></div><div class="fstat" th:classappend="${f.online}?'on':'off'"><span class="dot"></span><span class="t" th:text="${f.online}?#{friends.online}:#{friends.offline}"></span></div></div></div></div></div>
 </aside>
 <main class="main2"><div th:if="${success}" class="alert alert-ok" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${success}"></div><div th:if="${error}" class="alert alert-err" style="position:absolute;top:1rem;left:50%;transform:translateX(-50%);z-index:10" th:text="${error}"></div>
 <div id="empty" style="text-align:center;color:var(--muted)"><h3 style="color:var(--white)"th:text="#{friends.select}">选择好友</h3><p class="fs-sm"th:text="#{friends.selectdesc}">从列表中选择好友查看资料</p></div>
@@ -33,7 +34,21 @@
 <div id="pd" class="mb1"></div><div class="flex gap1"><a id="pmsg" href="#" class="btn btn-g"th:text="#{friends.sendmsg}">发送消息</a><a id="pprof" href="#" class="btn btn-b"th:text="#{friends.viewprof}">查看资料</a><form id="prem" th:action="@{/friends/remove}" method="post" style="display:inline" onsubmit="return confirm('确认移除？')"><input type="hidden" name="friendId" id="prid"><button class="btn btn-r"th:text="#{friends.remove}">删除好友</button></form></div></div>
 </main></div>
 <footer><span th:text="#{footer.copy}"></span>  <span th:text="#{footer.disclaimer}"></span></footer>
-<script>
+<script th:inline="javascript">
+var ONLINE_TXT=/*[[#{friends.online}]]*/'在线';
+var OFFLINE_TXT=/*[[#{friends.offline}]]*/'离线';
+function refreshOnlineStatus(){
+  fetch('/friends/online-status').then(function(r){return r.json()}).then(function(arr){
+    (arr||[]).forEach(function(o){
+      var el=document.querySelector('.fitem[data-id="'+o.id+'"]');if(!el)return;
+      var st=el.querySelector('.fstat');if(!st)return;
+      st.classList.remove('on','off');st.classList.add(o.online?'on':'off');
+      var t=st.querySelector('.t');if(t)t.textContent=o.online?ONLINE_TXT:OFFLINE_TXT;
+    });
+  }).catch(function(){});
+}
+setInterval(refreshOnlineStatus,30000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshOnlineStatus();});
 var tmr;
 function doSearch(){
     clearTimeout(tmr);

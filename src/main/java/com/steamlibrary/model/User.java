@@ -48,6 +48,10 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    /** Last time the user had any activity — drives online/offline (NULL = offline). */
+    @Column(name = "last_seen_at")
+    private LocalDateTime lastSeenAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

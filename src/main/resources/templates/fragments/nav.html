@@ -32,4 +32,12 @@
             </select>
         </div>
     </div>
+<script>
+// Heartbeat keeps the user "online" while any tab is open. Removed sendBeacon
+// (beforeunload/pagehide) because it fired on in-site navigation too and raced
+// with the next page's request, causing false "offline" flicker.
+function hb(){try{fetch('/friends/heartbeat',{credentials:'same-origin'})}catch(e){}}
+setInterval(hb,50000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)hb();});
+</script>
 </nav>

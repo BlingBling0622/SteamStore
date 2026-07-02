@@ -253,6 +253,8 @@ public class SteamOpenIdService {
             Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Mark the user online immediately after a successful Steam authentication
+        userRepository.updateLastSeenAt(user.getId(), java.time.LocalDateTime.now());
         log.info("User {} authenticated in security context", user.getUsername());
     }
 

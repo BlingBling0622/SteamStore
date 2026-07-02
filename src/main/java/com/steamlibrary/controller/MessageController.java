@@ -4,6 +4,7 @@ import com.steamlibrary.model.FriendRequest;
 import com.steamlibrary.model.Message;
 import com.steamlibrary.model.User;
 import com.steamlibrary.service.FriendService;
+import com.steamlibrary.service.GiphyService;
 import com.steamlibrary.service.MessageService;
 import com.steamlibrary.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class MessageController {
     private final MessageService messageService;
     private final FriendService friendService;
     private final UserService userService;
+    private final GiphyService giphyService;
 
     @GetMapping("/messages")
     @Transactional(readOnly = true)
@@ -171,5 +173,22 @@ public class MessageController {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("count", messageService.getUnreadCount(user));
         return result;
+    }
+
+    /**
+     * Giphy search for the {@code /giphy <keyword>} chat command. Used by both
+     * the 1:1 chat (messages.html) and group chat (groups.html). Returns a list
+     * of {id, url, preview} maps; the chosen gif's {@code url} is then sent as
+     * the message content via the normal /messages/send (or /groups/send) flow.
+     */
+    @GetMapping("/messages/giphy")
+    @ResponseBody
+    public List<Map<String, Object>> searchGiphy(@RequestParam String q,
+                                                   @RequestParam(defaultValue = "0") int offset,
+                                                   Authentication authentication) {
+        // authenticate() confirms the caller is logged in (SecurityConfig already
+        // enforces /messages/** = authenticated); no further per-user work needed.
+        // offset is used by the "load more" button to page through results.
+        return giphyService.search(q, 8, offset);
     }
 }

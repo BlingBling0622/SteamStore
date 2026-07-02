@@ -43,6 +43,7 @@ public class FriendController {
             fm.put("email", f.getEmail());
             fm.put("since", f.getCreatedAt() != null ? f.getCreatedAt().toString() : "");
             fm.put("updatedAt", f.getUpdatedAt() != null ? f.getUpdatedAt().toString() : "");
+            fm.put("online", UserService.isOnline(f));
             friendViews.add(fm);
         }
 
@@ -173,6 +174,7 @@ public class FriendController {
         profile.put("steamId", friend.getSteamId() != null ? friend.getSteamId() : "");
         profile.put("gameCount", storeService.getPurchasedProducts(friend).size());
         profile.put("totalSpent", storeService.getTotalSpent(friend));
+        profile.put("online", UserService.isOnline(friend));
 
         return profile;
     }
@@ -201,5 +203,47 @@ public class FriendController {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("count", friendService.getPendingCount(user));
         return result;
+    }
+
+    /** Lightweight online-status poll for the friends list. */
+    @GetMapping("/friends/online-status")
+    @ResponseBody
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> onlineStatus(Authentication authentication) {
+        User user = userService.findByUsername(authentication.getName());
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (User f : friendService.getFriends(user)) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", f.getId());
+            m.put("online", UserService.isOnline(f));
+            out.add(m);
+        }
+        return out;
+    }
+
+    /** Called by navigator.sendBeacon on page unload → mark offline immediately. */
+    @PostMapping("/friends/offline")
+    @ResponseBody
+    public Map<String, Object> goOffline(Authentication authentication) {
+        User user = userService.findByUsername(authentication.getName());
+        userService.clearLastSeenAt(user.getId());
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("ok", true);
+        return m;
+    }
+
+    /**
+     * Lightweight heartbeat polled every ~50s by the nav fragment while a tab is
+     * open. The {@code UserActivityInterceptor} updates {@code lastSeenAt} on
+     * every authenticated request, so this endpoint just needs to return 200 —
+     * no DB work here. This keeps the user "online" as long as any tab is open,
+     * even when idle or the tab is in the background.
+     */
+    @GetMapping("/friends/heartbeat")
+    @ResponseBody
+    public Map<String, Object> heartbeat(Authentication authentication) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("ok", true);
+        return m;
     }
 }

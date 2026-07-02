@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -50,5 +52,29 @@ public class UserService {
     @Transactional
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    // ---- Online / offline tracking ----
+
+    /** A user is "online" if they had activity within this many minutes. */
+    public static final long ONLINE_WINDOW_MINUTES = 2L;
+
+    public static boolean isOnline(LocalDateTime lastSeenAt) {
+        return lastSeenAt != null
+                && lastSeenAt.isAfter(LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES));
+    }
+
+    public static boolean isOnline(User user) {
+        return user != null && isOnline(user.getLastSeenAt());
+    }
+
+    @Transactional
+    public void updateLastSeenAt(Long userId) {
+        userRepository.updateLastSeenAt(userId, LocalDateTime.now());
+    }
+
+    @Transactional
+    public void clearLastSeenAt(Long userId) {
+        userRepository.clearLastSeenAt(userId);
     }
 }
