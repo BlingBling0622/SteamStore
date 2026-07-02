@@ -7,7 +7,9 @@
     <title th:text="#{register.title} + ' - Steam'">Create Account</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh}
+        body{font-family:'Arial',sans-serif;background:#1b2838;color:#c6d4df;display:flex;flex-direction:column;min-height:100vh;position:relative;overflow:hidden}
+        body::before{content:'';position:fixed;inset:0;background:url('/images/login-bg.png') center center/cover no-repeat;filter:blur(8px) brightness(.75);transform:scale(1.6) rotate(-27deg);z-index:0}
+        body>*{position:relative;z-index:1}
         nav{background:#171d25;border-bottom:1px solid #2a475e;padding:.75rem 0}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:2rem}
         .logo{font-size:1.5rem;font-weight:700;color:#fff;text-decoration:none}
@@ -18,7 +20,7 @@
         .lang-select{background:#2a475e;color:#c6d4df;border:1px solid #4b6a88;padding:.3rem .5rem;border-radius:2px;font-size:.8rem;cursor:pointer}
         .lang-select:focus{outline:none;border-color:#66c0f4}
         .center{flex:1;display:flex;justify-content:center;align-items:center;padding:3rem 20px}
-        .card{background:#2a475e;border:1px solid #4b6a88;border-radius:4px;padding:2.5rem;width:100%;max-width:420px}
+        .card{background:rgba(42,71,94,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
         .card h1{font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.05em}
         .form-group{margin-bottom:1.25rem}
         .form-group label{display:block;font-size:.85rem;color:#c6d4df;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em}
